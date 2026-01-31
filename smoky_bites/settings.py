@@ -7,7 +7,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-smokybites-mock-key')
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*'] # Allowed for initial staging, usually restricted to specific domains
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
 CSRF_TRUSTED_ORIGINS = ['https://*.render.com', 'https://*.vercel.app']
 
 INSTALLED_APPS = [
@@ -86,6 +90,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+WHITENOISE_MANIFEST_STRICT = False  # Prevent crash if an asset is missing
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
