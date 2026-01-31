@@ -1,0 +1,902 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .perspective-container {
+        perspective: 2000px;
+        height: 100dvh;
+        /* Use dynamic viewport height for mobile browsers */
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .flip-card {
+        width: 100%;
+        height: 100%;
+        /* Fill container */
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        will-change: transform;
+    }
+
+    .flip-card.flipped {
+        transform: rotateY(-180deg);
+    }
+
+    .card-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        top: 0;
+        left: 0;
+        background: #111 url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23222' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+        scroll-behavior: smooth;
+        will-change: scroll-position;
+    }
+
+    .card-front {
+        z-index: 2;
+    }
+
+    .card-back {
+        transform: rotateY(180deg);
+        z-index: 1;
+        overflow-y: auto;
+    }
+
+    .menu-item-row {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .menu-item-row::after {
+        content: "....................................................................................................";
+        position: absolute;
+        bottom: 5px;
+        left: 0;
+        right: 0;
+        z-index: 0;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .item-name {
+        background: #111;
+        position: relative;
+        z-index: 1;
+        padding-right: 10px;
+    }
+
+    .item-price {
+        background: #111;
+        position: relative;
+        z-index: 1;
+        padding-left: 10px;
+    }
+
+    /* Floating 3D Food */
+    .food-asset {
+        filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+        transition: transform 0.3s ease;
+    }
+
+    .food-asset:hover {
+        transform: scale(1.05) rotate(2deg);
+    }
+
+    /* Cart Modal */
+    #cart-modal,
+    #payment-modal,
+    #upi-modal {
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+    }
+
+    .btn-smooth {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-smooth:active {
+        transform: scale(0.92);
+    }
+
+    .btn-smooth:hover {
+        filter: brightness(1.2);
+    }
+
+    #cart-modal.open,
+    #payment-modal.open,
+    #upi-modal.open {
+        transform: translateY(0);
+    }
+
+    /* Sketchy Yellow Background for Headers */
+    .brush-bg {
+        background-color: #ffd700;
+        color: black;
+        padding: 5px 15px;
+        clip-path: polygon(3% 0%, 100% 2%, 98% 99%, 0% 100%);
+        box-shadow: 2px 2px 0px rgba(255, 255, 255, 0.1);
+        display: inline-block;
+        font-family: 'Marker', cursive;
+        letter-spacing: 2px;
+    }
+
+    /* Combo Boxes */
+    .combo-box {
+        background-color: #ffd700;
+        color: black;
+        padding: 10px;
+        clip-path: polygon(2% 4%, 98% 1%, 100% 97%, 3% 99%);
+        box-shadow: 4px 4px 0px rgba(50, 50, 50, 0.5);
+    }
+
+    @keyframes popIn {
+        0% {
+            transform: scale(0.5) rotate(-10deg);
+            opacity: 0;
+        }
+
+        80% {
+            transform: scale(1.1) rotate(5deg);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            filter: blur(10px);
+        }
+
+        to {
+            opacity: 1;
+            filter: blur(0);
+        }
+    }
+
+    .animate-fade {
+        animation: fadeIn 1.2s ease-out forwards;
+    }
+
+    .animate-pop {
+        animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    img {
+        image-rendering: high-quality;
+        image-rendering: -webkit-optimize-contrast;
+    }
+</style>
+
+<div class="perspective-container">
+    <div class="flip-card" id="main-card">
+
+        <!-- FRONT SIDE: PAGE 1 MENU -->
+        <div class="card-face card-front bg-[#111] overflow-y-auto">
+            <!-- Header Images -->
+
+
+
+            <!-- Branding -->
+            <div class="text-center mb-6 mt-12 relative z-20">
+                <h1 class="font-marker text-4xl text-yellow-400 mb-0 animate-pulse-slow">Feel The Taste</h1>
+                <h2 class="font-poster text-7xl text-white tracking-widest leading-none drop-shadow-lg">SMOKY<br>BITES
+                </h2>
+            </div>
+
+            <!-- Flip Button (Front) -->
+            <div class="text-center mb-2 mt-8 relative z-30">
+                <button onclick="flipCard()"
+                    class="bg-yellow-500 text-black font-poster text-xl px-6 py-2 rounded-full shadow-lg hover:scale-105 transition transform flex items-center justify-center mx-auto border-2 border-white btn-smooth">
+                    NEXT PAGE <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 gap-y-0 relative z-20 px-4">
+                {% for category in standard_categories %}
+                <div class="mb-0">
+                    {% if 'BURGER' in category.name|upper %}
+                    <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
+                        <div class="relative inline-block">
+                            <div
+                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
+                            </div>
+                            <img src="{% static 'img/Burgerimage.png' %}"
+                                class="relative w-24 h-auto contrast-110 animate-pop animate-fade" alt="Burgers">
+                        </div>
+                    </div>
+                    {% elif 'MOMO' in category.name|upper %}
+                    <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
+                        <div class="relative inline-block">
+                            <div
+                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
+                            </div>
+                            <img src="{% static 'img/Momos.png' %}"
+                                class="relative w-28 h-auto contrast-110 animate-pop animate-fade" alt="Momos">
+                        </div>
+                    </div>
+                    {% elif 'BROASTED' in category.name|upper %}
+                    <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
+                        <div class="relative inline-block">
+                            <div
+                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
+                            </div>
+                            <img src="{% static 'img/Brost.png' %}"
+                                class="relative w-28 h-auto contrast-110 animate-pop animate-fade" alt="Broast">
+                        </div>
+                    </div>
+                    {% elif 'MOCKTAIL' in category.name|upper %}
+                    <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
+                        <div class="relative inline-block">
+                            <div
+                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
+                            </div>
+                            <img src="{% static 'img/Mocktails.png' %}"
+                                class="relative w-28 h-auto contrast-110 animate-pop animate-fade" alt="Mocktails">
+                        </div>
+                    </div>
+                    {% elif 'HOT' in category.name|upper and 'CRISPY' in category.name|upper %}
+                    <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
+                        <div class="relative inline-block">
+                            <div
+                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
+                            </div>
+                            <img src="{% static 'img/Hotcrispy.png' %}"
+                                class="relative w-28 h-auto contrast-110 animate-pop animate-fade" alt="Hotcrispy">
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-0 text-center">
+                        <h2
+                            class="font-marker text-2xl text-black bg-yellow-400 inline-block px-4 py-1 skew-x-[-10deg] shadow-lg relative z-10">
+                            {{ category.name }}</h2>
+                    </div>
+
+                    <div class="space-y-3 px-2">
+                        {% for item in category.items.all %}
+                        <div class="flex justify-between items-end group">
+                            <div class="menu-item-row flex-1 flex justify-between items-end mr-2">
+                                <h3 class="item-name font-poster text-xl text-yellow-400 tracking-wide">{{ item.name }}
+                                </h3>
+                                <div class="item-price font-bold text-lg text-white">₹{{ item.price }}</div>
+                            </div>
+                            <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
+                                data-price="{{ item.price }}"
+                                data-image="{% if 'BURGER' in category.name|upper %}{% static 'img/Burgerimage.png' %}{% elif 'MOMO' in category.name|upper %}{% static 'img/Momos.png' %}{% elif 'BROASTED' in category.name|upper %}{% static 'img/Brost.png' %}{% elif 'MOCKTAIL' in category.name|upper %}{% static 'img/Mocktails.png' %}{% elif 'HOT' in category.name|upper and 'CRISPY' in category.name|upper %}{% static 'img/Hotcrispy.png' %}{% else %}{% static 'img/placeholder.png' %}{% endif %}"
+                                class="bg-yellow-500 text-black font-bold text-xs px-2 py-1 rounded hover:bg-white transition uppercase mb-1 btn-smooth">
+                                ADD
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- Spacer for bottom bar -->
+            <div class="h-16"></div>
+        </div>
+
+        <!-- BACK SIDE: PAGE 2 MENU -->
+        <div class="card-face card-back bg-[#111] overflow-y-auto">
+            <!-- Header -->
+            <div class="text-center mb-6 mt-8 relative z-20">
+                <h2
+                    class="font-poster text-5xl text-white tracking-widest leading-none drop-shadow-lg border-b-4 border-yellow-500 inline-block">
+                    SPECIALS</h2>
+            </div>
+
+            <!-- Flip Button (Back) -->
+            <div class="text-center mb-8 mt-8 relative z-30">
+                <button onclick="flipCard()"
+                    class="bg-gray-800 text-white font-poster text-xl px-6 py-2 rounded-full shadow-lg hover:bg-gray-700 transition transform flex items-center justify-center mx-auto border-2 border-yellow-500 btn-smooth">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg> PREVIOUS PAGE
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 gap-y-4 relative z-20 px-4">
+                {% for category in special_categories %}
+                <div class="mb-1">
+                    <div class="mb-1 text-center">
+                        <h2
+                            class="font-marker text-2xl text-black bg-yellow-400 inline-block px-4 py-1 skew-x-[-10deg] shadow-lg">
+                            {{ category.name }}</h2>
+                    </div>
+
+                    <div class="space-y-1 px-2">
+                        {% for item in category.items.all %}
+                        {% if category.name != 'COMBOS' %}
+                        <!-- Standard Item Styling -->
+                        <div class="flex justify-between items-end group">
+                            <div class="menu-item-row flex-1 flex justify-between items-end mr-2">
+                                <h3 class="item-name font-poster text-xl text-yellow-400 tracking-wide">{{ item.name }}
+                                </h3>
+                                <div class="item-price font-bold text-lg text-white">₹{{ item.price }}</div>
+                            </div>
+                            <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
+                                data-price="{{ item.price }}" data-image="{% static 'img/Brost.png' %}"
+                                class="bg-yellow-500 text-black font-bold text-xs px-2 py-1 rounded hover:bg-white transition uppercase mb-1 btn-smooth">
+                                ADD
+                            </button>
+                        </div>
+                        {% else %}
+                        <!-- Combo Item Styling -->
+                        {% if 'LARGE' in item.name %}
+                        <div class="mb-[-20px] translate-y-6 relative z-20 flex justify-start ml-2">
+                            <div class="relative inline-block">
+                                <div
+                                    class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
+                                </div>
+                                <img src="{% static 'img/Largecombo.png' %}"
+                                    class="relative w-32 h-auto contrast-125 animate-pop animate-fade"
+                                    alt="Large Combo">
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if 'MEDIUM' in item.name %}
+                        <div class="mb-[-18px] translate-y-1 relative z-20 flex justify-start ml-2">
+                            <div class="relative inline-block">
+                                <div
+                                    class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
+                                </div>
+                                <img src="{% static 'img/Mediumcombo.png' %}"
+                                    class="relative w-32 h-auto contrast-125 animate-pop animate-fade"
+                                    alt="Medium Combo">
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="mb-0 -mt-16 border border-gray-800 p-2 rounded relative bg-gray-900 group">
+
+
+                            <div class="flex justify-between items-center border-b border-gray-700 pb-1 mb-1">
+                                <h3 class="font-poster text-xl text-yellow-400 tracking-wide">{{ item.name }}</h3>
+                                <div class="font-bold text-lg text-white">₹{{ item.price }}</div>
+                            </div>
+                            <div class="font-marker text-xs text-gray-300 leading-snug">
+                                {% if 'MEDIUM' in item.name %}
+                                2 LEG PIECE • 2 WINGS • 2 LOLLIPOP • 6 PIECE TIKKA • 1 MOJITO
+                                {% elif 'LARGE' in item.name %}
+                                2 LEG PIECE • 4 WINGS • 4 LOLLIPOP • 8 PIECE MALAI TIKKA • 2 TYPES OF MOJITO
+                                {% endif %}
+                            </div>
+                            <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
+                                data-price="{{ item.price }}"
+                                data-image="{% if 'MEDIUM' in item.name %}{% static 'img/Mediumcombo.png' %}{% else %}{% static 'img/Largecombo.png' %}{% endif %}"
+                                class="absolute -top-2 -right-2 bg-yellow-500 text-black font-bold h-6 w-6 rounded-full flex items-center justify-center hover:bg-white transition shadow-lg z-50 btn-smooth">
+                                +
+                            </button>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- Spacer for bottom bar -->
+            <div class="h-16"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Floating Action Bar - Moved OUTSIDE perspective container -->
+<div
+    class="fixed bottom-0 left-0 right-0 max-w-[420px] md:max-w-[520px] lg:max-w-[600px] mx-auto bg-yellow-500 p-2 z-50 rounded-t-2xl shadow-[0_-5px_15px_rgba(255,215,0,0.2)]">
+    <div class="container mx-auto flex justify-between items-center px-2">
+        <div class="flex items-center space-x-3">
+            <div class="bg-black text-white font-bold rounded-full w-10 h-10 flex items-center justify-center border-2 border-white"
+                id="float-qty">0</div>
+            <div class="flex flex-col">
+                <span class="text-black text-xs font-bold uppercase">Total</span>
+                <span id="float-total" class="text-black font-poster text-2xl leading-none">₹0</span>
+            </div>
+        </div>
+
+        <button onclick="toggleCart()"
+            class="bg-black text-yellow-500 font-bold px-6 py-2 rounded-full uppercase tracking-wider shadow-lg flex items-center text-sm transform active:scale-90 transition-transform duration-150">
+            VIEW CART
+            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
+                </path>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<!-- Modals - Moved OUTSIDE perspective container -->
+
+<!-- 1. Cart Modal Overlay -->
+<div id="cart-modal"
+    class="fixed inset-0 z-[60] transform translate-y-full transition-transform duration-300 invisible">
+    <div class="absolute inset-0 bg-black bg-opacity-80 backdrop-blur-sm" onclick="toggleCart()"></div>
+    <div
+        class="absolute bottom-0 left-0 right-0 max-w-[420px] md:max-w-[520px] lg:max-w-[600px] mx-auto bg-[#0f0f0f] border-t-2 border-yellow-500 rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl">
+
+        <!-- Handle -->
+        <div class="w-full flex justify-center pt-3 pb-1" onclick="toggleCart()">
+            <div class="w-12 h-1.5 bg-gray-700 rounded-full"></div>
+        </div>
+
+        <div class="p-6 flex-1 overflow-y-auto">
+            <h2 class="font-poster text-3xl text-yellow-400 mb-6 text-center">YOUR ORDER</h2>
+
+            <div id="cart-list" class="space-y-3 mb-6">
+                <!-- Items -->
+            </div>
+        </div>
+
+        <div class="p-4 bg-gray-900 border-t border-gray-800">
+            <div class="flex justify-between text-xl font-poster text-white mb-4">
+                <span>TOTAL TO PAY</span>
+                <span id="cart-modal-total" class="text-yellow-400">₹0</span>
+            </div>
+            <button onclick="openPaymentSelection()"
+                class="w-full bg-yellow-500 text-black font-poster text-2xl py-3 rounded-xl hover:bg-yellow-400 transition transform active:scale-95 shadow-lg">
+                PROCEED TO PAYMENT
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Payment Selection Modal -->
+<div id="payment-modal"
+    class="fixed inset-0 z-[70] transform translate-y-full transition-transform duration-300 invisible">
+    <div class="absolute inset-0 bg-black bg-opacity-90 backdrop-blur-md" onclick="closePaymentSelection()"></div>
+    <div
+        class="absolute bottom-0 left-0 right-0 max-w-[420px] md:max-w-[520px] lg:max-w-[600px] mx-auto bg-[#111] border-t-4 border-yellow-500 rounded-t-3xl min-h-[50vh] flex flex-col p-8">
+
+        <h2 class="font-poster text-3xl text-white text-center mb-8">CHOOSE PAYMENT</h2>
+
+        <div class="mb-6" id="name-input-container">
+            <label for="customer-name" class="block text-white font-poster text-lg mb-2">ENTER YOUR NAME</label>
+            <input type="text" id="customer-name" placeholder="John Doe"
+                class="w-full bg-gray-800 text-white border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-yellow-500 font-bold mb-4">
+
+            <label for="customer-number" class="block text-white font-poster text-lg mb-2">PHONE NUMBER</label>
+            <input type="tel" id="customer-number" placeholder="9876543210"
+                class="w-full bg-gray-800 text-white border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-yellow-500 font-bold">
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mb-8">
+            <button onclick="processCashPayment(event)"
+                class="bg-gray-800 border-2 border-gray-600 rounded-2xl p-6 flex flex-col items-center justify-center hover:border-yellow-500 hover:bg-gray-700 transition group btn-smooth">
+                <svg class="w-12 h-12 text-gray-400 mb-3 group-hover:text-yellow-500" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
+                    </path>
+                </svg>
+                <span class="font-poster text-xl text-white">CASH</span>
+                <span class="text-xs text-gray-500 mt-1">Pay at Counter</span>
+            </button>
+            <button onclick="initiateUpiPayment(event)"
+                class="bg-gray-800 border-2 border-gray-600 rounded-2xl p-6 flex flex-col items-center justify-center hover:border-yellow-500 hover:bg-gray-700 transition group btn-smooth">
+                <svg class="w-12 h-12 text-gray-400 mb-3 group-hover:text-yellow-500" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 14.5v.01M12 18.5v.01M12 12.5v.01M12 8.5v.01M12 20.5v.01M12 16.5v.01">
+                    </path>
+                </svg>
+                <span class="font-poster text-xl text-white">UPI</span>
+                <span class="text-xs text-gray-500 mt-1">Scan QR Code</span>
+            </button>
+        </div>
+
+        <button onclick="closePaymentSelection()"
+            class="mt-auto w-full border border-gray-600 text-gray-400 py-3 rounded-xl hover:text-white uppercase tracking-widest text-sm">Cancel</button>
+    </div>
+</div>
+
+<!-- 3. UPI QR Code Modal -->
+<div id="upi-modal" class="fixed inset-0 z-[80] transform translate-y-full transition-transform duration-300 invisible">
+    <div class="absolute inset-0 bg-black bg-opacity-95" onclick="closeUpiModal()"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm px-6">
+        <div class="bg-white p-6 rounded-3xl shadow-2xl text-center relative">
+
+            <h3 class="font-poster text-2xl text-black mb-2">SCAN TO PAY</h3>
+            <p class="text-gray-500 text-sm mb-6">Order ID: <span id="upi-order-id" class="font-bold"></span></p>
+            <p class="text-gray-500 text-sm mb-6">Total Amount: <span id="upi-total-amount"
+                    class="font-bold text-black">₹0</span></p>
+
+            <div class="bg-gray-100 p-4 rounded-xl mb-6 inline-block">
+                <!-- QR Image injected via JS -->
+                <img id="upi-qr-image" src="" alt="Loading QR..." class="w-48 h-48 mx-auto mix-blend-multiply">
+            </div>
+
+            <p class="text-xs text-gray-400 mb-6 font-bold">Scan & Pay using any UPI app</p>
+
+            <button onclick="confirmUpiPayment(event)"
+                class="w-full bg-green-500 text-white font-poster text-xl py-3 rounded-xl shadow-lg hover:bg-green-600 transition animate-pulse">
+                I HAVE PAID
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let isFlipped = false;
+    let currentOrderId = null; // Store order ID for UPI check
+
+    function flipCard() {
+        const card = document.getElementById('main-card');
+        const front = document.querySelector('.card-front');
+        const back = document.querySelector('.card-back');
+
+        isFlipped = !isFlipped;
+        if (isFlipped) {
+            card.classList.add('flipped');
+            if (back) back.scrollTop = 0; // Scroll container
+        } else {
+            card.classList.remove('flipped');
+            if (front) front.scrollTop = 0; // Scroll container
+        }
+    }
+
+    function showModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('invisible');
+        // Force browser reflow to enable transition
+        void modal.offsetWidth;
+        modal.classList.remove('translate-y-full');
+    }
+
+    function hideModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.add('translate-y-full');
+        setTimeout(() => {
+            modal.classList.add('invisible');
+        }, 300);
+    }
+
+    function toggleCart() {
+        const modal = document.getElementById('cart-modal');
+        if (modal.classList.contains('translate-y-full')) {
+            renderCartList();
+            showModal('cart-modal');
+        } else {
+            hideModal('cart-modal');
+        }
+    }
+
+    // --- Payment Flow Logic ---
+
+    function openPaymentSelection() {
+        if (cart.length === 0) return alert("Cart is empty!");
+        hideModal('cart-modal');
+        showModal('payment-modal');
+        checkCustomerName();
+    }
+
+    function checkCustomerName() {
+        const savedName = localStorage.getItem('smokybites_customer_name');
+        const savedNumber = localStorage.getItem('smokybites_customer_number');
+        const container = document.getElementById('name-input-container');
+
+        if (savedName && savedNumber) {
+            container.style.display = 'none';
+        } else {
+            container.style.display = 'block';
+
+            const nameInput = document.getElementById('customer-name');
+            const numberInput = document.getElementById('customer-number');
+
+            if (savedName) {
+                nameInput.value = savedName;
+            } else {
+                nameInput.value = "Guest " + Math.floor(1000 + Math.random() * 9000);
+            }
+
+            if (savedNumber) {
+                numberInput.value = savedNumber;
+            } else {
+                numberInput.value = "9" + Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
+            }
+        }
+    }
+
+    function closePaymentSelection() {
+        hideModal('payment-modal');
+        showModal('cart-modal');
+    }
+
+    // --- New UPI Flow ---
+
+    async function initiateUpiPayment(event) {
+        let customerName = localStorage.getItem('smokybites_customer_name');
+        let customerNumber = localStorage.getItem('smokybites_customer_number');
+
+        if (!customerName || !customerNumber) {
+            const nameInput = document.getElementById('customer-name');
+            const numberInput = document.getElementById('customer-number');
+
+            customerName = nameInput.value.trim();
+            customerNumber = numberInput.value.trim();
+
+            if (!customerName) {
+                alert("Please enter your name!");
+                nameInput.focus();
+                return;
+            }
+            if (!customerNumber) {
+                alert("Please enter your number!");
+                numberInput.focus();
+                return;
+            }
+
+            // Save for future
+            localStorage.setItem('smokybites_customer_name', customerName);
+            localStorage.setItem('smokybites_customer_number', customerNumber);
+        }
+
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "Opening UPI...";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('/place_order/', {
+                method: 'POST',
+                body: JSON.stringify({
+                    items: cart,
+                    payment_method: 'UPI',
+                    customer_name: customerName,
+                    customer_number: customerNumber
+                }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                currentOrderId = data.order_id;
+
+                // Setup Fallback QR Modal in background
+                document.getElementById('upi-total-amount').innerText = '₹' + data.amount;
+                document.getElementById('upi-order-id').innerText = '#' + data.order_id;
+                document.getElementById('upi-qr-image').src = data.qr_url;
+
+                // --- UPI Deep Link Logic ---
+                // Attempt to open the UPI app directly
+                if (data.upi_uri) {
+                    window.location.href = data.upi_uri;
+                }
+
+                // Fallback: If the user is still on this page after 2 seconds, 
+                // it likely means the UPI app didn't open or couldn't handle the URI.
+                setTimeout(() => {
+                    // Check if we are still active and not already on success page
+                    if (!document.hidden && window.location.pathname.includes('/menu/')) {
+                        hideModal('payment-modal');
+                        showModal('upi-modal');
+                    }
+                }, 2000);
+
+            } else {
+                alert("Failed to initiate payment");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Network error");
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    async function confirmUpiPayment(event) {
+        if (!currentOrderId) return;
+
+        const btn = event.target;
+        btn.innerText = "Verifying...";
+        btn.disabled = true;
+
+        const response = await fetch('/confirm_payment/', {
+            method: 'POST',
+            body: JSON.stringify({ order_id: currentOrderId }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.ok) {
+            localStorage.removeItem('smokybites_cart');
+            window.location.href = `/order_success/${currentOrderId}/`;
+        } else {
+            alert("Error confirming payment.");
+            btn.innerText = "I HAVE PAID";
+            btn.disabled = false;
+        }
+    }
+
+    function closeUpiModal() {
+        // Technically shouldn't close without paying, but if they do:
+        hideModal('upi-modal');
+        showModal('payment-modal');
+    }
+
+    // --- Cash Submission Logic ---
+
+    async function processCashPayment(event) {
+        console.log("Processing Cash Payment...");
+        let customerName = localStorage.getItem('smokybites_customer_name');
+        let customerNumber = localStorage.getItem('smokybites_customer_number');
+
+        if (!customerName || !customerNumber) {
+            const nameInput = document.getElementById('customer-name');
+            const numberInput = document.getElementById('customer-number');
+
+            customerName = nameInput.value.trim();
+            customerNumber = numberInput.value.trim();
+
+            if (!customerName) {
+                alert("Please enter your name!");
+                nameInput.focus();
+                return;
+            }
+            if (!customerNumber) {
+                alert("Please enter your number!");
+                numberInput.focus();
+                return;
+            }
+            localStorage.setItem('smokybites_customer_name', customerName);
+            localStorage.setItem('smokybites_customer_number', customerNumber);
+        }
+
+        const btn = event.currentTarget;
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = "<div class='text-yellow-500 animate-spin mb-2'>⌛</div><span class='text-sm'>Processing...</span>";
+        btn.disabled = true;
+
+        try {
+            await submitOrder('CASH', customerName, customerNumber);
+        } catch (err) {
+            console.error(err);
+            alert("Payment failed. Please check your connection.");
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+        }
+    }
+
+    async function submitOrder(method, customerName, customerNumber) {
+        try {
+            const response = await fetch('/place_order/', {
+                method: 'POST',
+                body: JSON.stringify({
+                    items: cart,
+                    payment_method: method,
+                    customer_name: customerName,
+                    customer_number: customerNumber
+                }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.removeItem('smokybites_cart');
+                window.location.href = `/order_success/${data.order_id}/`;
+            } else {
+                const errorData = await response.json();
+                alert("Error: " + (errorData.error || "Unknown error occurred"));
+                throw new Error(errorData.error || "Server error");
+            }
+        } catch (err) {
+            console.error("Order Submission Error:", err);
+            throw err; // Re-throw to be caught by processCashPayment
+        }
+    }
+
+
+    // Quick add from list
+    function quickAdd(el) {
+        const id = parseInt(el.dataset.id);
+        const name = el.dataset.name;
+        const price = parseFloat(el.dataset.price);
+        const image = el.dataset.image;
+
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+            existing.quantity++;
+        } else {
+            cart.push({ id, name, price, quantity: 1, image: image });
+        }
+        localStorage.setItem('smokybites_cart', JSON.stringify(cart));
+        updateCartDisplay();
+
+        // Button feedback
+        const originalText = el.innerText;
+        el.innerText = "✓";
+        el.classList.add("bg-white", "text-black", "scale-110");
+
+        // Float Qty Animation
+        const qtyEl = document.getElementById('float-qty');
+        if (qtyEl) {
+            qtyEl.classList.remove('animate-pop');
+            void qtyEl.offsetWidth; // trigger reflow
+            qtyEl.classList.add('animate-pop');
+        }
+
+        setTimeout(() => {
+            el.innerText = originalText;
+            el.classList.remove("bg-white", "text-black", "scale-110");
+        }, 600);
+    }
+
+    function updateCartDisplay() {
+        const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+        const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+
+        const totalEl = document.getElementById('float-total');
+        const qtyEl = document.getElementById('float-qty');
+
+        if (totalEl) totalEl.innerText = '₹' + total;
+        if (qtyEl) qtyEl.innerText = count;
+    }
+
+    function renderCartList() {
+        const container = document.getElementById('cart-list');
+        container.innerHTML = '';
+        let total = 0;
+
+        if (cart.length === 0) {
+            container.innerHTML = '<div class="text-center text-gray-500 py-4">Cart is empty</div>';
+        }
+
+        cart.forEach((item, index) => {
+            total += item.price * item.quantity;
+            const div = document.createElement('div');
+            div.className = 'flex justify-between items-center bg-gray-800 p-3 rounded-lg border border-gray-700 mb-3';
+            div.innerHTML = `
+            <div class="flex items-center">
+                <div class="w-12 h-12 rounded-lg bg-gray-900 border border-gray-600 flex-shrink-0 mr-3 overflow-hidden">
+                    <img src="${item.image || '/static/img/placeholder.png'}" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h3 class="font-poster text-lg text-white leading-tight">${item.name}</h3>
+                    <div class="text-sm text-gray-400">₹${item.price} each</div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 bg-black rounded-lg px-2 py-1 border border-gray-600">
+                <button onclick="changeQty(${index}, -1)" class="text-yellow-500 font-bold text-lg px-2">-</button>
+                <span class="font-bold text-white w-4 text-center">${item.quantity}</span>
+                <button onclick="changeQty(${index}, 1)" class="text-yellow-500 font-bold text-lg px-2">+</button>
+            </div>
+        `;
+            container.appendChild(div);
+        });
+
+        document.getElementById('cart-modal-total').innerText = '₹' + total;
+    }
+
+    function changeQty(index, delta) {
+        cart[index].quantity += delta;
+        if (cart[index].quantity <= 0) {
+            cart.splice(index, 1);
+        }
+        localStorage.setItem('smokybites_cart', JSON.stringify(cart));
+        updateCartDisplay();
+        renderCartList();
+
+        if (cart.length === 0) hideModal('cart-modal');
+    }
+
+    // Init
+    updateCartDisplay();
+</script>
+{% endblock %}

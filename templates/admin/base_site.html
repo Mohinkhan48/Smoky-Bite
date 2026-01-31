@@ -1,0 +1,399 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}
+<link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #ffd700;
+        --secondary: #111;
+        --accent: #ffd700;
+        --primary-fg: #000;
+        --body-fg: #ffffff;
+        --body-bg: #111111;
+        --header-bg: #000000;
+        --header-color: #ffd700;
+        --module-bg: #1a1a1a;
+        --border: #333;
+        --button-bg: #ffd700;
+        --button-fg: #000000;
+        --link-fg: #ffd700;
+        --link-hover-color: #ffffff;
+        --object-tools-bg: #333;
+        --object-tools-fg: #fff;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--body-bg) !important;
+        color: var(--body-fg) !important;
+    }
+
+    #header {
+        background: var(--header-bg) !important;
+        border-bottom: 2px solid var(--primary);
+    }
+
+    #branding h1 {
+        font-family: 'Poster', 'Bebas Neue', sans-serif !important;
+        font-size: 2rem !important;
+        color: var(--primary) !important;
+        letter-spacing: 2px;
+    }
+
+    #branding h1 a {
+        color: var(--primary) !important;
+    }
+
+    div.breadcrumbs {
+        background: rgba(255, 255, 255, 0.02) !important;
+        color: #888 !important;
+        padding: 10px 40px !important;
+        border-bottom: 1px solid #222 !important;
+        font-size: 0.8rem;
+    }
+
+    div.breadcrumbs a {
+        color: var(--primary) !important;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .module caption,
+    .module h2 {
+        background: #252525 !important;
+        font-family: 'Poster', 'Bebas Neue', sans-serif !important;
+        color: #fff !important;
+        letter-spacing: 1px;
+        padding: 12px 15px !important;
+        border-bottom: 1px solid #333 !important;
+    }
+
+    a.section:link,
+    a.section:visited {
+        color: var(--primary) !important;
+        font-family: 'Poster', 'Bebas Neue', sans-serif !important;
+        font-size: 1.2rem;
+    }
+
+    .button,
+    input[type=submit],
+    input[type=button],
+    .submit-row input,
+    a.button {
+        background: var(--primary) !important;
+        color: #000 !important;
+        font-weight: bold !important;
+        text-transform: uppercase;
+        border: none !important;
+        transition: transform 0.1s;
+    }
+
+    .button:hover,
+    input[type=submit]:hover {
+        background: #fff !important;
+        transform: scale(1.05);
+    }
+
+    .module {
+        border: 1px solid #333 !important;
+        background: var(--module-bg) !important;
+    }
+
+    /* Form rows */
+    .form-row {
+        border-bottom: 1px solid #333 !important;
+    }
+
+    label {
+        color: #ccc !important;
+    }
+
+    /* Change list table */
+    #changelist table {
+        background: var(--module-bg);
+        color: #fff;
+    }
+
+    #changelist table thead th {
+        background: #000 !important;
+        color: var(--primary) !important;
+        font-family: 'Poster', 'Bebas Neue', sans-serif;
+        font-size: 1.1rem;
+    }
+
+    #changelist table tbody tr {
+        background: transparent !important;
+        border-bottom: 1px solid #333;
+    }
+
+    #changelist table tbody tr:hover {
+        background: #222 !important;
+    }
+
+    #changelist table tbody td a {
+        color: #fff !important;
+    }
+
+    /* Dashboard specific */
+    .dashboard .module table th {
+        width: 100%;
+    }
+
+    /* Login Page */
+    .login #header {
+        background: #000 !important;
+    }
+
+    .login .submit-row input {
+        background: var(--primary) !important;
+        color: #000 !important;
+    }
+
+    /* Layout Containers */
+    #content {
+        padding: 30px 40px !important;
+    }
+
+    .dashboard #content {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+
+    /* User Tools (Top Right) */
+    #user-tools {
+        color: #fff !important;
+        font-family: 'Poster', 'Bebas Neue', sans-serif !important;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+        margin-top: 0;
+    }
+
+    #user-tools a {
+        color: var(--primary) !important;
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+        margin: 0 5px;
+    }
+
+    #user-tools a:hover {
+        color: #fff !important;
+        border-bottom: 2px solid var(--primary);
+    }
+
+    #user-tools strong {
+        color: #fff;
+        margin-right: 10px;
+    }
+
+    /* Page Titles ("Site administration") */
+    #content h1 {
+        font-family: 'Poster', 'Bebas Neue', sans-serif !important;
+        font-size: 2rem !important;
+        color: var(--primary) !important;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Dashboard Modules */
+    .dashboard .module table caption {
+        font-family: 'Poster', 'Bebas Neue', sans-serif !important;
+        font-size: 1.5rem !important;
+        background: transparent !important;
+        color: var(--primary) !important;
+        padding-left: 0;
+        text-align: left;
+        margin-bottom: 10px;
+    }
+
+    .dashboard .module {
+        background: transparent !important;
+        border: none !important;
+        margin-bottom: 30px;
+    }
+
+    .dashboard .module table {
+        border-collapse: separate;
+        border-spacing: 0 5px;
+        /* Spacing between rows */
+    }
+
+    .dashboard .module tr {
+        background: #1a1a1a !important;
+        transition: all 0.2s ease;
+    }
+
+    .dashboard .module tr:hover {
+        background: #222 !important;
+        transform: scale(1.01);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        z-index: 10;
+        position: relative;
+    }
+
+    .dashboard .module td,
+    .dashboard .module th {
+        border: none !important;
+        padding: 15px !important;
+    }
+
+    .dashboard .module a {
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }
+
+    /* Add/Change Links */
+    .dashboard .module .addlink,
+    .dashboard .module .changelink {
+        color: #888 !important;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        padding-left: 20px;
+    }
+
+    .dashboard .module .addlink:hover,
+    .dashboard .module .changelink:hover {
+        color: var(--primary) !important;
+    }
+
+    /* Sidebar (Recent Actions) */
+    #content-related {
+        background: #1a1a1a !important;
+        border: 1px solid #333;
+        border-radius: 8px;
+        margin-right: 0;
+    }
+
+    #content-related h3 {
+        font-family: 'Poster', 'Bebas Neue', sans-serif !important;
+        color: #000 !important;
+        background: var(--primary) !important;
+        padding: 10px 15px !important;
+        margin: 0 !important;
+        font-size: 1.2rem !important;
+    }
+
+    #content-related .actionlist {
+        padding: 15px;
+    }
+
+    #content-related .actionlist li {
+        margin-bottom: 15px;
+        border-bottom: 1px solid #333;
+        padding-bottom: 10px;
+    }
+
+    /* Action Icons */
+    .addlink,
+    .changelink,
+    .deletelink {
+        padding-left: 0 !important;
+        background: none !important;
+    }
+
+    .actionlist .addlink::before {
+        content: "+ ";
+        color: #4caf50;
+        font-weight: bold;
+    }
+
+    .actionlist .changelink::before {
+        content: "✎ ";
+        color: var(--primary);
+        font-weight: bold;
+    }
+
+    .actionlist .deletelink::before {
+        content: "✕ ";
+        color: #f44336;
+        font-weight: bold;
+    }
+
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 768px) {
+
+        /* Header Stacking */
+        #header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            height: auto !important;
+        }
+
+        #branding h1 {
+            margin: 0 0 10px 0 !important;
+            font-size: 1.5rem !important;
+            text-align: center;
+        }
+
+        #user-tools {
+            position: static !important;
+            float: none !important;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        #user-tools a {
+            display: inline-block;
+            margin: 5px;
+        }
+
+        /* Dashboard Modules Full Width */
+        .dashboard .module table {
+            width: 100%;
+        }
+
+        div.breadcrumbs {
+            display: none;
+            /* Hide breadcrumbs on mobile to save space */
+        }
+
+        /* Sidebar Stacking */
+        #content-related {
+            width: 100% !important;
+            float: none !important;
+            margin-top: 20px;
+        }
+
+        .dashboard .module {
+            margin-bottom: 20px;
+        }
+
+        /* Larger touch targets */
+        .dashboard .module td,
+        .dashboard .module th {
+            padding: 10px 5px !important;
+        }
+
+        /* Adjust action list for mobile */
+        #content-related .actionlist li {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+<link rel="stylesheet" href="/static/css/admin_custom.css">
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">ORDERS ADMINISTRATION</a></h1>
+{% endblock %}
+
+{% block usertools %}
+<div id="user-tools">
+    WELCOME, <strong>{{ user.get_username|upper }}</strong>.
+    <a href="/">VIEW SITE</a> /
+    <a href="{% url 'admin:password_change' %}">PASSWORD</a> /
+    <a href="{% url 'admin:logout' %}">LOGOUT</a>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

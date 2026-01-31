@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center mb-8">
+    <h2 class="font-poster text-4xl text-yellow-400 border-b-4 border-white inline-block">YOUR CART</h2>
+</div>
+
+<div id="cart-items" class="space-y-4 mb-8">
+    <!-- Items injected by JS -->
+    <div class="text-center text-gray-500 py-10">Your cart is empty.</div>
+</div>
+
+<!-- Name Input Section -->
+<div id="name-input-container" class="mb-6 hidden">
+    <label class="block text-yellow-400 font-poster text-xl mb-2">ENTER YOUR NAME</label>
+    <input type="text" id="customer-name"
+        class="w-full bg-gray-800 text-white border-2 border-gray-600 rounded p-3 font-poster text-lg focus:outline-none focus:border-yellow-500 mb-4"
+        placeholder="Your Name">
+
+    <label class="block text-yellow-400 font-poster text-xl mb-2">PHONE NUMBER</label>
+    <input type="tel" id="customer-number"
+        class="w-full bg-gray-800 text-white border-2 border-gray-600 rounded p-3 font-poster text-lg focus:outline-none focus:border-yellow-500"
+        placeholder="9876543210">
+</div>
+
+<div class="border-t-2 border-gray-700 pt-4 mb-8">
+    <div class="flex justify-between text-2xl font-poster">
+        <span>TOTAL</span>
+        <span id="total-display" class="text-yellow-400">₹0</span>
+    </div>
+</div>
+
+<button onclick="placeOrder()"
+    class="w-full bg-yellow-500 text-black font-poster text-3xl py-3 rounded hover:bg-yellow-400 transition mb-4">
+    CONFIRM ORDER
+</button>
+
+<button onclick="window.location.href='/'"
+    class="w-full border-2 border-gray-600 text-gray-400 font-poster text-xl py-2 rounded hover:text-white transition">
+    BACK TO MENU
+</button>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const container = document.getElementById('cart-items');
+    const nameInputContainer = document.getElementById('name-input-container');
+    const customerNameInput = document.getElementById('customer-name');
+
+    function checkCustomerName() {
+        const savedName = localStorage.getItem('smokybites_customer_name');
+        const savedNumber = localStorage.getItem('smokybites_customer_number');
+
+        if (savedName && savedNumber) {
+            nameInputContainer.style.display = 'none';
+        } else {
+            nameInputContainer.style.display = 'block';
+
+            const nameInput = document.getElementById('customer-name');
+            const numberInput = document.getElementById('customer-number');
+
+            if (savedName) {
+                nameInput.value = savedName;
+            } else {
+                nameInput.value = "Guest " + Math.floor(1000 + Math.random() * 9000);
+            }
+
+            if (savedNumber) {
+                numberInput.value = savedNumber;
+            } else {
+                numberInput.value = "9" + Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
+            }
+        }
+    }
+
+    function renderCart() {
+        container.innerHTML = '';
+        if (cart.length === 0) {
+            container.innerHTML = '<div class="text-center text-gray-500 py-10">Your cart is empty.</div>';
+            document.getElementById('total-display').innerText = '0';
+            nameInputContainer.style.display = 'none'; // Hide name input if cart is empty
+            return;
+        }
+
+        let total = 0;
+        cart.forEach((item, index) => {
+            total += item.price * item.quantity;
+
+            const div = document.createElement('div');
+            div.className = 'flex justify-between items-center bg-gray-800 p-4 rounded mb-2';
+            div.innerHTML = `
+                <div class="flex items-center">
+                    <div class="w-16 h-16 rounded bg-gray-900 border border-gray-700 mr-4 overflow-hidden flex-shrink-0">
+                        <img src="${item.image || '/static/img/placeholder.png'}" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h3 class="font-poster text-xl text-white leading-tight">${item.name}</h3>
+                        <div class="text-yellow-500">₹${item.price} each</div>
+                    </div>
+                </div>
+                <div class="flex items-center bg-black rounded p-1 border border-gray-600">
+                    <button onclick="changeQty(${index}, -1)" class="w-8 h-8 text-yellow-500 font-bold text-xl">-</button>
+                    <span class="w-8 text-center font-bold text-white">${item.quantity}</span>
+                    <button onclick="changeQty(${index}, 1)" class="w-8 h-8 text-yellow-500 font-bold text-xl">+</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+
+        document.getElementById('total-display').innerText = '₹' + total;
+
+        // Check name requirement only if cart is not empty
+        checkCustomerName();
+    }
+
+    function changeQty(index, delta) {
+        cart[index].quantity += delta;
+        if (cart[index].quantity <= 0) {
+            cart.splice(index, 1);
+        }
+        localStorage.setItem('smokybites_cart', JSON.stringify(cart));
+        renderCart();
+        updateCartUI();
+    }
+
+    async function placeOrder() {
+        if (cart.length === 0) return alert("Cart is empty!");
+
+        let customerName = localStorage.getItem('smokybites_customer_name');
+        let customerNumber = localStorage.getItem('smokybites_customer_number');
+
+        if (!customerName || !customerNumber) {
+            const nameInput = document.getElementById('customer-name');
+            const numberInput = document.getElementById('customer-number');
+
+            customerName = nameInput.value.trim();
+            customerNumber = numberInput.value.trim();
+
+            if (!customerName) {
+                alert("Please enter your name to proceed.");
+                nameInput.focus();
+                return;
+            }
+            if (!customerNumber) {
+                alert("Please enter your phone number to proceed.");
+                numberInput.focus();
+                return;
+            }
+
+            localStorage.setItem('smokybites_customer_name', customerName);
+            localStorage.setItem('smokybites_customer_number', customerNumber);
+        }
+
+        const response = await fetch('/place_order/', {
+            method: 'POST',
+            body: JSON.stringify({
+                items: cart,
+                customer_name: customerName,
+                customer_number: customerNumber
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.removeItem('smokybites_cart');
+            window.location.href = `/order_success/${data.order_id}/`;
+        } else {
+            alert("Something went wrong. Please try again.");
+        }
+    }
+
+    renderCart();
+</script>
+{% endblock %}

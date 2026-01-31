@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smoky Bites</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=Roboto:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* RESET */
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+            background-color: #111;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* MAIN WRAPPER */
+        .menu-wrapper {
+            width: 100%;
+            max-width: 420px;
+            /* perfect mobile width */
+            margin: 0 auto;
+            /* center on desktop */
+            position: relative;
+        }
+
+        /* DESKTOP VIEW */
+        @media (min-width: 768px) {
+            .menu-wrapper {
+                max-width: 520px;
+                /* little wider on desktop */
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .menu-wrapper {
+                max-width: 600px;
+                /* clean desktop look */
+            }
+        }
+
+        .font-marker {
+            font-family: 'Permanent Marker', cursive;
+        }
+
+        .font-poster {
+            font-family: 'Bebas Neue', display;
+        }
+
+        .brush-stroke {
+            background-color: #FFD700;
+            color: #111;
+            padding: 5px 20px;
+            transform: skew(-5deg);
+            border-radius: 4px;
+            box-shadow: 2px 2px 0px rgba(255, 255, 255, 0.1);
+            display: inline-block;
+        }
+
+        .btn-add {
+            transition: all 0.2s;
+        }
+
+        .btn-add:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gray-900 flex justify-center">
+    <!-- Mobile App Container -->
+    <div class="menu-wrapper bg-[#111] min-h-screen shadow-2xl">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Floating Cart Button Removed -->
+
+    <script>
+        // Simple Cart Logic
+        window.cart = JSON.parse(localStorage.getItem('smokybites_cart')) || [];
+
+        function updateCartUI() {
+            // Cart UI removed as per request
+        }
+
+        updateCartUI();
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

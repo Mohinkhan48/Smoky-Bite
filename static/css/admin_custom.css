@@ -1,0 +1,124 @@
+/* SMOKY BITES - PROFESSIONAL POS ADMIN THEME */
+
+:root {
+    --bg-dark: #111;
+    --card-bg: #1a1a1a;
+    --primary-yellow: #ffd700;
+    --text-light: #fff;
+    --text-muted: #888;
+}
+
+/* Status Badges - Pill Style */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background-color: #f39c12;
+    color: #fff;
+}
+
+.status-confirmed {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.status-preparing {
+    background-color: #9b59b6;
+    color: #fff;
+}
+
+.status-ready {
+    background-color: #2ecc71;
+    color: #fff;
+}
+
+.status-completed {
+    background-color: #27ae60;
+    color: #fff;
+}
+
+.status-cancelled {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.status-paid {
+    background-color: #27ae60;
+    color: #fff;
+}
+
+.status-unpaid {
+    background-color: #e67e22;
+    color: #fff;
+}
+
+.status-failed {
+    background-color: #c0392b;
+    color: #fff;
+}
+
+/* Table Styling */
+#changelist table tbody tr.row-pending {
+    border-left: 4px solid #f39c12;
+}
+
+#changelist table tbody tr.row-paid {
+    background-color: rgba(39, 174, 96, 0.05) !important;
+}
+
+/* Custom Button Styling */
+.button,
+input[type=submit],
+.submit-row input {
+    background: var(--primary-yellow) !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    border-radius: 4px !important;
+    transition: all 0.2s;
+}
+
+.button:hover,
+input[type=submit]:hover {
+    background: #fff !important;
+    transform: scale(1.02);
+}
+
+/* Fieldset Styling */
+fieldset.module {
+    background: var(--card-bg) !important;
+    border: 1px solid #333 !important;
+    border-radius: 8px;
+    margin-bottom: 20px !important;
+}
+
+fieldset.module h2 {
+    background: #333 !important;
+    color: #fff !important;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Layout Adjustments */
+#content {
+    background-color: var(--bg-dark) !important;
+}
+
+.module {
+    margin-bottom: 30px !important;
+}
+
+/* List display names */
+.customer-name-bold {
+    font-weight: bold;
+    color: var(--primary-yellow);
+}
+
+.phone-link {
+    text-decoration: none;
+    color: #3498db;
+}

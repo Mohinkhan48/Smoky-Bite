@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center py-20">
+    <div class="mb-6 inline-block p-4 border-4 border-yellow-500 rounded-full">
+        <svg fill="currentColor" class="w-16 h-16 text-yellow-500" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"></path>
+        </svg>
+    </div>
+
+    <h1 class="font-marker text-4xl text-white mb-4">Order Placed!</h1>
+    <p class="text-gray-400 text-xl mb-2 font-poster tracking-wide">Thank You, <span
+            class="text-yellow-400 font-bold uppercase">{{ order.customer_name }}</span>!</p>
+    <p class="text-gray-500 mb-8">Your smoky treat is being prepared.</p>
+
+    <div class="bg-gray-800 p-6 rounded-lg mb-8 max-w-xs mx-auto">
+        <p class="text-sm text-gray-400 mb-1">ORDER ID</p>
+        <p class="text-2xl font-poster text-yellow-400 tracking-wider">#{{ order.order_id|slice:":8" }}</p>
+    </div>
+
+    <a href="/" class="inline-block bg-yellow-500 text-black font-bold py-3 px-8 rounded uppercase tracking-wide">
+        Order More
+    </a>
+</div>
+{% endblock %}
