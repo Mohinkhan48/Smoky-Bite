@@ -16,7 +16,6 @@ def get_safe_category(name):
         return cats.first()
     else:
         # Self-healing: Duplicates found
-        print(f"WARNING: duplicate categories found for '{name}'. Merging...")
         primary = cats.first()
         for duplicate in cats[1:]:
             # Move items if any (though safe to checking)
@@ -151,7 +150,6 @@ def place_order(request):
                     f"&tr=ORDER{order.order_id}"
                 )
                 
-                print("UPI URI:", upi_uri)
                 
                 # Encode for Google Charts QR URL
                 encoded_upi = quote(upi_uri)
