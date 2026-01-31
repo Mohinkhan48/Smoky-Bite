@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-smokybites-mock-key')
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*'] # Allowed for initial staging, usually restricted to specific domains
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
