@@ -469,6 +469,7 @@
         class="absolute bottom-0 left-0 right-0 max-w-[420px] md:max-w-[520px] lg:max-w-[600px] mx-auto bg-[#111] border-t-4 border-yellow-500 rounded-t-3xl min-h-[50vh] flex flex-col p-8">
 
         <h2 class="font-poster text-3xl text-white text-center mb-8">CHOOSE PAYMENT</h2>
+        {% csrf_token %}
 
         <div class="mb-6" id="name-input-container">
             <label for="customer-name" class="block text-white font-poster text-lg mb-2">ENTER YOUR NAME</label>
@@ -481,7 +482,7 @@
         </div>
 
         <div class="grid grid-cols-2 gap-6 mb-8">
-            <button onclick="processCashPayment(event)"
+            <button onclick="processCashPayment(this, event)"
                 class="bg-gray-800 border-2 border-gray-600 rounded-2xl p-6 flex flex-col items-center justify-center hover:border-yellow-500 hover:bg-gray-700 transition group btn-smooth">
                 <svg class="w-12 h-12 text-gray-400 mb-3 group-hover:text-yellow-500" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
@@ -492,7 +493,7 @@
                 <span class="font-poster text-xl text-white">CASH</span>
                 <span class="text-xs text-gray-500 mt-1">Pay at Counter</span>
             </button>
-            <button onclick="initiateUpiPayment(event)"
+            <button onclick="initiateUpiPayment(this, event)"
                 class="bg-gray-800 border-2 border-gray-600 rounded-2xl p-6 flex flex-col items-center justify-center hover:border-yellow-500 hover:bg-gray-700 transition group btn-smooth">
                 <svg class="w-12 h-12 text-gray-400 mb-3 group-hover:text-yellow-500" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
@@ -642,8 +643,8 @@
     }
 
     // --- New UPI Flow ---
-
-    async function initiateUpiPayment(event) {
+    async function initiateUpiPayment(btnElement, event) {
+        console.log("UPI Payment Initiated");
         let customerName = localStorage.getItem('smokybites_customer_name');
         let customerNumber = localStorage.getItem('smokybites_customer_number');
 
@@ -670,8 +671,9 @@
             localStorage.setItem('smokybites_customer_number', customerNumber);
         }
 
-        const btn = event.target.closest('button');
+        const btn = btnElement;
         const originalText = btn.innerHTML;
+        console.log("Placing UPI Order...");
         btn.innerHTML = "Opening UPI...";
         btn.disabled = true;
 
@@ -684,7 +686,10 @@
                     customer_name: customerName,
                     customer_number: customerNumber
                 }),
-                headers: { 'Content-Type': 'application/json' }
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                }
             });
 
             if (response.ok) {
@@ -757,9 +762,8 @@
     }
 
     // --- Cash Submission Logic ---
-
-    async function processCashPayment(event) {
-        console.log("Processing Cash Payment...");
+    async function processCashPayment(btnElement, event) {
+        console.log("Cash Payment Initiated");
         let customerName = localStorage.getItem('smokybites_customer_name');
         let customerNumber = localStorage.getItem('smokybites_customer_number');
 
@@ -784,8 +788,9 @@
             localStorage.setItem('smokybites_customer_number', customerNumber);
         }
 
-        const btn = event.currentTarget;
+        const btn = btnElement;
         const originalContent = btn.innerHTML;
+        console.log("Placing Cash Order...");
         btn.innerHTML = "<div class='text-yellow-500 animate-spin mb-2'>⌛</div><span class='text-sm'>Processing...</span>";
         btn.disabled = true;
 
