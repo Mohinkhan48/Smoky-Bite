@@ -2,12 +2,31 @@
     console.log("Admin Notifications Script Loaded");
 
     let lastOrderId = localStorage.getItem('last_notified_order');
-    let soundEnabled = false;
+    let soundEnabled = localStorage.getItem('sound_notifications_enabled') === 'true';
     const POLLING_INTERVAL = 10000; // Poll every 10 seconds
 
     // Create the Toggle Button
     const toggleBtn = document.createElement('div');
     toggleBtn.id = "notif-toggle";
+
+    function updateUI(playSound = false) {
+        if (soundEnabled) {
+            text.innerText = "NOTIFICATIONS: ON";
+            toggleBtn.style.background = "#ffd700";
+            toggleBtn.style.borderColor = "#fff";
+            toggleBtn.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.4)';
+            text.style.color = "#000";
+            icon.style.filter = 'grayscale(0) opacity(1)';
+            if (playSound) playNotification();
+        } else {
+            text.innerText = "NOTIFICATIONS: OFF";
+            toggleBtn.style.background = 'rgba(255, 255, 255, 0.05)';
+            toggleBtn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            toggleBtn.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+            text.style.color = "#888";
+            icon.style.filter = 'grayscale(1) opacity(0.5)';
+        }
+    }
     toggleBtn.style.display = 'inline-flex';
     toggleBtn.style.alignItems = 'center';
     toggleBtn.style.marginLeft = '20px';
@@ -108,23 +127,9 @@
     toggleBtn.onclick = (e) => {
         e.preventDefault();
         soundEnabled = !soundEnabled;
-        if (soundEnabled) {
-            text.innerText = "NOTIFICATIONS: ON";
-            toggleBtn.style.background = "#ffd700";
-            toggleBtn.style.borderColor = "#fff";
-            toggleBtn.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.4)';
-            text.style.color = "#000";
-            icon.style.filter = 'grayscale(0) opacity(1)';
-            playNotification();
-            checkNewOrders(); // Trigger immediate check when turned ON
-        } else {
-            text.innerText = "NOTIFICATIONS: OFF";
-            toggleBtn.style.background = 'rgba(255, 255, 255, 0.05)';
-            toggleBtn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-            toggleBtn.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
-            text.style.color = "#888";
-            icon.style.filter = 'grayscale(1) opacity(0.5)';
-        }
+        localStorage.setItem('sound_notifications_enabled', soundEnabled);
+        updateUI(true);
+        if (soundEnabled) checkNewOrders();
     };
 
     // Injection Logic: Target the header area robustly
@@ -167,9 +172,13 @@
     }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', injectToggle);
+        document.addEventListener('DOMContentLoaded', () => {
+            injectToggle();
+            updateUI();
+        });
     } else {
         injectToggle();
+        updateUI();
     }
 
     async function checkNewOrders() {
@@ -202,6 +211,15 @@
                     localStorage.setItem('last_notified_order', lastOrderId);
                     if (soundEnabled) {
                         playNotification();
+
+                        // AUTO-REFRESH: If on the "Your orders" list page, refresh to show the new order
+                        const path = window.location.pathname;
+                        if (path.includes('/admin/orders/order/') && !path.includes('/add/') && !path.match(/\/\d+\//)) {
+                            console.log("New order detected on list page. Auto-refreshing...");
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500); // 1.5s delay so the sound plays first
+                        }
                     } else {
                         console.warn("New order detected, but NOTIFICATIONS are currently OFF.");
                     }

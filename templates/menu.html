@@ -525,6 +525,49 @@
     </div>
 </div>
 
+<!-- 2.5. UPI App Chooser Modal -->
+<div id="upi-app-modal"
+    class="fixed inset-0 z-[75] transform translate-y-full transition-transform duration-300 invisible">
+    <div class="absolute inset-0 bg-black bg-opacity-90 backdrop-blur-md" onclick="closeUpiAppModal()"></div>
+    <div
+        class="absolute bottom-0 left-0 right-0 max-w-[420px] md:max-w-[520px] lg:max-w-[600px] mx-auto bg-[#111] border-t-4 border-yellow-500 rounded-t-3xl min-h-[40vh] flex flex-col p-8">
+
+        <h2 class="font-poster text-3xl text-white text-center mb-6 tracking-widest">PAY USING APP</h2>
+
+        <div class="grid grid-cols-1 gap-4 mb-8">
+            <!-- PhonePe -->
+            <button onclick="payWithApp('phonepe')"
+                class="bg-[#5f259f] text-white rounded-xl p-4 flex items-center justify-between hover:brightness-110 transition btn-smooth">
+                <span class="font-bold text-lg ml-2">PhonePe</span>
+                <span class="text-xs opacity-80 uppercase tracking-tighter font-bold">Recommended</span>
+            </button>
+
+            <!-- GPay -->
+            <button onclick="payWithApp('gpay')"
+                class="bg-white text-gray-800 rounded-xl p-4 flex items-center justify-between hover:bg-gray-100 transition btn-smooth">
+                <span class="font-bold text-lg ml-2">Google Pay</span>
+                <span class="text-xs opacity-60 uppercase tracking-tighter font-bold">Fast & Secure</span>
+            </button>
+
+            <!-- Paytm -->
+            <button onclick="payWithApp('paytm')"
+                class="bg-[#00baf2] text-white rounded-xl p-4 flex items-center justify-between hover:brightness-110 transition btn-smooth">
+                <span class="font-bold text-lg ml-2">Paytm</span>
+                <span class="text-xs opacity-80 uppercase tracking-tighter font-bold">Wallet & UPI</span>
+            </button>
+
+            <!-- Any Other / QR -->
+            <button onclick="showQrModal()"
+                class="bg-gray-800 border border-gray-600 text-yellow-500 rounded-xl p-4 flex items-center justify-center hover:bg-gray-700 transition btn-smooth">
+                <span class="font-bold text-lg">OTHER APP / SCAN QR</span>
+            </button>
+        </div>
+
+        <button onclick="closeUpiAppModal()"
+            class="mt-auto w-full border border-gray-600 text-gray-400 py-3 rounded-xl hover:text-white uppercase tracking-widest text-sm">Back</button>
+    </div>
+</div>
+
 <!-- 3. UPI QR Code Modal -->
 <div id="upi-modal" class="fixed inset-0 z-[80] transform translate-y-full transition-transform duration-300 invisible">
     <div class="absolute inset-0 bg-black bg-opacity-95" onclick="closeUpiModal()"></div>
@@ -573,6 +616,7 @@
 
     let isFlipped = false;
     let currentOrderId = null; // Store order ID for UPI check
+    let cachedUpiUri = null;   // Store the raw UPI link
 
     function flipCard() {
         const card = document.getElementById('main-card');
@@ -719,27 +763,16 @@
             if (response.ok) {
                 const data = await response.json();
                 currentOrderId = data.order_id;
+                cachedUpiUri = data.upi_uri; // Store for app-specific buttons
 
-                // Setup Fallback QR Modal in background
+                // Setup QR Modal for fallback
                 document.getElementById('upi-total-amount').innerText = '₹' + data.amount;
                 document.getElementById('upi-order-id').innerText = '#' + data.order_id;
                 document.getElementById('upi-qr-image').src = data.qr_url;
 
-                // --- UPI Deep Link Logic ---
-                // Attempt to open the UPI app directly
-                if (data.upi_uri) {
-                    window.location.href = data.upi_uri;
-                }
-
-                // Fallback: If the user is still on this page after 2 seconds, 
-                // it likely means the UPI app didn't open or couldn't handle the URI.
-                setTimeout(() => {
-                    // Check if we are still active and not already on success page
-                    if (!document.hidden && window.location.pathname.includes('/menu/')) {
-                        hideModal('payment-modal');
-                        showModal('upi-modal');
-                    }
-                }, 2000);
+                // Show the App Chooser Modal
+                hideModal('payment-modal');
+                showModal('upi-app-modal');
 
             } else {
                 alert("Failed to initiate payment");
@@ -779,10 +812,47 @@
         }
     }
 
+    function closeUpiAppModal() {
+        hideModal('upi-app-modal');
+        showModal('payment-modal');
+    }
+
+    function showQrModal() {
+        hideModal('upi-app-modal');
+        showModal('upi-modal');
+    }
+
+    function payWithApp(appName) {
+        if (!cachedUpiUri) return;
+
+        let appUri = cachedUpiUri;
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+
+        if (appName === 'phonepe') {
+            appUri = cachedUpiUri.replace('upi://', 'phonepe://');
+        } else if (appName === 'paytm') {
+            appUri = cachedUpiUri.replace('upi://', 'paytmmp://');
+        } else if (appName === 'gpay') {
+            if (isIOS) {
+                appUri = cachedUpiUri.replace('upi://', 'tez://upi/');
+            }
+            // On Android, generic upi:// is usually fine for GPay, but we can't force it easily without intent://
+        }
+
+        console.log("Opening App URI:", appUri);
+        window.location.href = appUri;
+
+        // After opening the app, wait a bit and show the final "I have paid" screen (the QR modal)
+        // so they can confirm the payment after returning from the app.
+        setTimeout(() => {
+            showQrModal();
+        }, 1500);
+    }
+
     function closeUpiModal() {
         // Technically shouldn't close without paying, but if they do:
         hideModal('upi-modal');
-        showModal('payment-modal');
+        showModal('upi-app-modal'); // Go back to chooser instead of payment selection
     }
 
     // --- Cash Submission Logic ---

@@ -144,19 +144,24 @@ def place_order(request):
                 upi_conf = getattr(settings, 'UPI_CONFIG', {})
                 upi_id = upi_conf.get('ID', 'smokybites@upi')
                 merchant_name = upi_conf.get('MERCHANT_NAME', 'Smoky Bites')
-                currency = upi_conf.get('CURRENCY', 'INR')
-                
-                # Precise user requested format
                 merchant_quoted = quote(merchant_name)
                 amount = float(total)
+                mc = upi_conf.get('MC', '5411') # Business Merchant Category Code
+                
+                # BUSINESS MODE: 
+                # For registered merchants, adding 'mc' and a concise 'tr' 
+                # is mandatory for secure and trackable transactions.
+                short_tr = f"SB{str(order.order_id).replace('-', '')[:20]}"
                 
                 upi_uri = (
                     f"upi://pay?"
                     f"pa={upi_id}"
                     f"&pn={merchant_quoted}"
-                    f"&am={amount}"
+                    f"&mc={mc}"
+                    f"&am={amount:.2f}"
                     f"&cu={currency}"
-                    f"&tr=ORDER{order.order_id}"
+                    f"&tr={short_tr}"
+                    f"&tn=SmokyBitesOrder"
                 )
                 
                 

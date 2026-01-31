@@ -98,6 +98,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 UPI_CONFIG = {
     'ID': 'paytm.s17ewnw@pty',  # Replace with actual Merchant UPI ID
     'MERCHANT_NAME': 'SHAUL KHAN',
+    'MC': '5411',              # REPLACE THIS with your actual 4-digit Category Code (MCC)
     'CURRENCY': 'INR',
 }
 
