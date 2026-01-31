@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.utils import timezone
 from django.db.models import Sum, F
 from .models import Category, MenuItem, Order, OrderItem
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.admin import UserAdmin, GroupAdmin
 import uuid
 
 class SmokyBitesAdminSite(admin.AdminSite):
@@ -159,3 +161,7 @@ class OrderAdmin(admin.ModelAdmin):
         css = {
             'all': ('css/admin_custom.css',)
         }
+
+# Allow User/Group management in the custom admin panel
+admin_site.register(User, UserAdmin)
+admin_site.register(Group, GroupAdmin)

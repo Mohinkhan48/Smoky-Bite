@@ -393,7 +393,11 @@
     WELCOME, <strong>{{ user.get_username|upper }}</strong>.
     <a href="/">VIEW SITE</a> /
     <a href="{% url 'admin:password_change' %}">PASSWORD</a> /
-    <a href="{% url 'admin:logout' %}">LOGOUT</a>
+    <form action="{% url 'admin:logout' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit"
+            style="background:none; border:none; color:var(--primary); font-family:inherit; font-size:inherit; cursor:pointer; padding:0; margin:0 5px; text-transform:uppercase;">LOGOUT</button>
+    </form>
 </div>
 {% endblock %}
 
