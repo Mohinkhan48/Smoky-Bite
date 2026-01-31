@@ -215,7 +215,7 @@
                             <div
                                 class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
                             </div>
-                            <img src="{% static 'img/burger_v2.png' %}"
+                            <img src="{% static 'img/Burgerimage.png' %}"
                                 class="relative w-24 h-auto contrast-110 animate-pop animate-fade" alt="Burgers">
                         </div>
                     </div>
@@ -225,7 +225,7 @@
                             <div
                                 class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
                             </div>
-                            <img src="{% static 'img/momos_v2.png' %}"
+                            <img src="{% static 'img/Momos.png' %}"
                                 class="relative w-28 h-auto contrast-110 animate-pop animate-fade" alt="Momos">
                         </div>
                     </div>
@@ -235,7 +235,7 @@
                             <div
                                 class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
                             </div>
-                            <img src="{% static 'img/brost_v2.png' %}"
+                            <img src="{% static 'img/Brost.png' %}"
                                 class="relative w-28 h-auto contrast-110 animate-pop animate-fade" alt="Broast">
                         </div>
                     </div>
@@ -245,7 +245,7 @@
                             <div
                                 class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
                             </div>
-                            <img src="{% static 'img/mocktails_v2.png' %}"
+                            <img src="{% static 'img/Mocktails.png' %}"
                                 class="relative w-28 h-auto contrast-110 animate-pop animate-fade" alt="Mocktails">
                         </div>
                     </div>
@@ -255,7 +255,7 @@
                             <div
                                 class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
                             </div>
-                            <img src="{% static 'img/hotcrispy_v2.png' %}"
+                            <img src="{% static 'img/Hotcrispy.png' %}"
                                 class="relative w-28 h-auto contrast-110 animate-pop animate-fade" alt="Hotcrispy">
                         </div>
                     </div>
@@ -277,7 +277,7 @@
                             </div>
                             <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
                                 data-price="{{ item.price }}"
-                                data-image="{% if 'BURGER' in category.name|upper %}{% static 'img/burger_v2.png' %}{% elif 'MOMO' in category.name|upper %}{% static 'img/momos_v2.png' %}{% elif 'BROASTED' in category.name|upper %}{% static 'img/brost_v2.png' %}{% elif 'MOCKTAIL' in category.name|upper %}{% static 'img/mocktails_v2.png' %}{% elif 'HOT' in category.name|upper and 'CRISPY' in category.name|upper %}{% static 'img/hotcrispy_v2.png' %}{% else %}{% static 'img/placeholder.png' %}{% endif %}"
+                                data-image="{% if 'BURGER' in category.name|upper %}{% static 'img/Burgerimage.png' %}{% elif 'MOMO' in category.name|upper %}{% static 'img/Momos.png' %}{% elif 'BROASTED' in category.name|upper %}{% static 'img/Brost.png' %}{% elif 'MOCKTAIL' in category.name|upper %}{% static 'img/Mocktails.png' %}{% elif 'HOT' in category.name|upper and 'CRISPY' in category.name|upper %}{% static 'img/Hotcrispy.png' %}{% else %}{% static 'img/placeholder.png' %}{% endif %}"
                                 class="bg-yellow-500 text-black font-bold text-xs px-2 py-1 rounded hover:bg-white transition uppercase mb-1 btn-smooth">
                                 ADD
                             </button>
@@ -331,7 +331,7 @@
                                 <div class="item-price font-bold text-lg text-white">₹{{ item.price }}</div>
                             </div>
                             <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
-                                data-price="{{ item.price }}" data-image="{% static 'img/brost_v2.png' %}"
+                                data-price="{{ item.price }}" data-image="{% static 'img/Brost.png' %}"
                                 class="bg-yellow-500 text-black font-bold text-xs px-2 py-1 rounded hover:bg-white transition uppercase mb-1 btn-smooth">
                                 ADD
                             </button>
@@ -339,24 +339,24 @@
                         {% else %}
                         <!-- Combo Item Styling -->
                         {% if 'LARGE' in item.name %}
-                        <div class="mb-[-20px] translate-y-6 relative z-20 flex justify-start ml-2">
+                        <div class="mb-[-16px] translate-y-5 relative z-20 flex justify-start ml-2">
                             <div class="relative inline-block">
                                 <div
                                     class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
                                 </div>
-                                <img src="{% static 'img/large_v2.png' %}"
+                                <img src="{% static 'img/Largecombo.png' %}"
                                     class="relative w-32 h-auto contrast-125 animate-pop animate-fade"
                                     alt="Large Combo">
                             </div>
                         </div>
                         {% endif %}
                         {% if 'MEDIUM' in item.name %}
-                        <div class="mb-[-18px] translate-y-1 relative z-20 flex justify-start ml-2">
+                        <div class="mb-[-16px] translate-y-1 relative z-20 flex justify-start ml-2">
                             <div class="relative inline-block">
                                 <div
                                     class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
                                 </div>
-                                <img src="{% static 'img/medium_v2.png' %}"
+                                <img src="{% static 'img/Mediumcombo.png' %}"
                                     class="relative w-32 h-auto contrast-125 animate-pop animate-fade"
                                     alt="Medium Combo">
                             </div>
@@ -378,7 +378,7 @@
                             </div>
                             <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
                                 data-price="{{ item.price }}"
-                                data-image="{% if 'MEDIUM' in item.name %}{% static 'img/medium_v2.png' %}{% else %}{% static 'img/large_v2.png' %}{% endif %}"
+                                data-image="{% if 'MEDIUM' in item.name %}{% static 'img/Mediumcombo.png' %}{% else %}{% static 'img/Largecombo.png' %}{% endif %}"
                                 class="absolute -top-2 -right-2 bg-yellow-500 text-black font-bold h-6 w-6 rounded-full flex items-center justify-center hover:bg-white transition shadow-lg z-50 btn-smooth">
                                 +
                             </button>
@@ -436,7 +436,12 @@
         </div>
 
         <div class="p-6 flex-1 overflow-y-auto">
-            <h2 class="font-poster text-3xl text-yellow-400 mb-6 text-center">YOUR ORDER</h2>
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="emptyCart()"
+                    class="text-xs text-gray-500 hover:text-red-500 transition uppercase font-bold tracking-widest bg-gray-900 px-3 py-1 rounded-lg border border-gray-800">EMPTY
+                    CART</button>
+                <h2 class="font-poster text-3xl text-yellow-400 text-center flex-1 pr-12">YOUR ORDER</h2>
+            </div>
 
             <div id="cart-list" class="space-y-3 mb-6">
                 <!-- Items -->
@@ -534,6 +539,23 @@
 
 {% block scripts %}
 <script>
+    // --- CSRF Utility ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
     let isFlipped = false;
     let currentOrderId = null; // Store order ID for UPI check
 
@@ -712,7 +734,10 @@
         const response = await fetch('/confirm_payment/', {
             method: 'POST',
             body: JSON.stringify({ order_id: currentOrderId }),
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            }
         });
 
         if (response.ok) {
@@ -784,7 +809,10 @@
                     customer_name: customerName,
                     customer_number: customerNumber
                 }),
-                headers: { 'Content-Type': 'application/json' }
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                }
             });
 
             if (response.ok) {
@@ -894,6 +922,14 @@
         renderCartList();
 
         if (cart.length === 0) hideModal('cart-modal');
+    }
+
+    function emptyCart() {
+        if (!confirm("Remove all items?")) return;
+        cart = [];
+        localStorage.setItem('smokybites_cart', JSON.stringify(cart));
+        updateCartDisplay();
+        hideModal('cart-modal');
     }
 
     // Init

@@ -8,6 +8,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-smokybites-mock-key')
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://*.render.com', 'https://*.vercel.app']
 
 INSTALLED_APPS = [
     'django.contrib.admin',

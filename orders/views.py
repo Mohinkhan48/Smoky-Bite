@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from .models import Category, MenuItem, Order, OrderItem
 
 def get_safe_category(name):
@@ -59,8 +59,8 @@ def menu_view(request):
                     defaults={'price': price}
                 )
 
-    # Fetch all active categories with their items
-    categories = Category.objects.all().prefetch_related('items')
+    # Fetch all active categories with their items - Optmized with prefetch_related
+    categories = Category.objects.filter(is_active=True).prefetch_related('items')
     specials_names = ['HOT & SPICY', 'PERI PERI', 'MALAI SPECIAL', 'COMBOS']
     
     standard_categories = [c for c in categories if c.name not in specials_names]
@@ -81,7 +81,7 @@ def menu_view(request):
 def cart_view(request):
     return render(request, 'cart.html')
 
-@csrf_exempt
+
 def place_order(request):
     if request.method == 'POST':
         try:
@@ -165,7 +165,7 @@ def place_order(request):
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
-@csrf_exempt
+
 def confirm_payment(request):
     if request.method == 'POST':
         try:

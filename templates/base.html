@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -91,10 +92,51 @@
         // Simple Cart Logic
         window.cart = JSON.parse(localStorage.getItem('smokybites_cart')) || [];
 
+        // --- SELF-HEALING CART (Fixes stale/broken images in localStorage) ---
+        const imageSyncMap = {
+            'CKN STEEM MOMOS': "{% static 'img/Momos.png' %}",
+            'CKN FRIED MOMOS': "{% static 'img/Momos.png' %}",
+            'CKN PERI PERI FRIED MOMOS': "{% static 'img/Momos.png' %}",
+            'CKN BURGER': "{% static 'img/Burgerimage.png' %}",
+            'CKN CHEESE BURGER': "{% static 'img/Burgerimage.png' %}",
+            'CKN ZINGER BURGER': "{% static 'img/Burgerimage.png' %}",
+            'BROASTED CHICKEN (4 PCS)': "{% static 'img/Brost.png' %}",
+            'PERI PERI FRENCH FRIES': "{% static 'img/Brost.png' %}",
+            'SALTED FRENCH FRIES': "{% static 'img/Brost.png' %}",
+            'CKN CHEESE BALLS (5 PCS)': "{% static 'img/Hotcrispy.png' %}",
+            'CKN CRISPY STRIPS (5 PCS)': "{% static 'img/Hotcrispy.png' %}",
+            'CKN NUGGETS (5 PCS)': "{% static 'img/Hotcrispy.png' %}",
+            'CKN CRISPY POPCORN': "{% static 'img/Hotcrispy.png' %}",
+            'BLUE ANGEL': "{% static 'img/Mocktails.png' %}",
+            'LIME MINT': "{% static 'img/Mocktails.png' %}",
+            'BLUEBERRY': "{% static 'img/Mocktails.png' %}",
+            'GINGER LIME': "{% static 'img/Mocktails.png' %}",
+            'LEG PIECE ( 1 PCS )': "{% static 'img/Brost.png' %}",
+            'LOLLIPOP ( 4 PCS )': "{% static 'img/Brost.png' %}",
+            'WINGS ( 5 PCS )': "{% static 'img/Brost.png' %}",
+            'TIKKA ( 8 PCS )': "{% static 'img/Brost.png' %}",
+            'MEDIUM COMBO': "{% static 'img/Mediumcombo.png' %}",
+            'LARGE COMBO': "{% static 'img/Largecombo.png' %}"
+        };
+
+        // Sync existing cart items to correct paths
+        let needsSave = false;
+        window.cart = window.cart.map(item => {
+            const correctPath = imageSyncMap[item.name.toUpperCase().trim()];
+            if (correctPath && item.image !== correctPath) {
+                needsSave = true;
+                return { ...item, image: correctPath };
+            }
+            return item;
+        });
+
+        if (needsSave) {
+            localStorage.setItem('smokybites_cart', JSON.stringify(window.cart));
+        }
+
         function updateCartUI() {
             // Cart UI removed as per request
         }
-
         updateCartUI();
     </script>
     {% block scripts %}{% endblock %}
