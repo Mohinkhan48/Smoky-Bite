@@ -221,51 +221,41 @@
                     {% if 'BURGER' in category.name|upper %}
                     <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
                         <div class="relative inline-block">
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                            </div>
-                            <img src="{% static 'img/Burgerimage.png' %}" class="relative w-24 h-auto contrast-110"
-                                alt="Burgers">
+                            <img src="{% static 'img/Burgerimage.png' %}" class="relative w-24 h-auto" alt="Burgers"
+                                loading="eager" fetchpriority="high"
+                                style="opacity: 1 !important; visibility: visible !important;">
                         </div>
                     </div>
                     {% elif 'MOMO' in category.name|upper %}
                     <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
                         <div class="relative inline-block">
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                            </div>
-                            <img src="{% static 'img/Momos.png' %}" class="relative w-28 h-auto contrast-110"
-                                alt="Momos">
+                            <img src="{% static 'img/Momos.png' %}" class="relative w-28 h-auto" alt="Momos"
+                                loading="eager" fetchpriority="high"
+                                style="opacity: 1 !important; visibility: visible !important;">
                         </div>
                     </div>
                     {% elif 'BROASTED' in category.name|upper %}
                     <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
                         <div class="relative inline-block">
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                            </div>
-                            <img src="{% static 'img/Brost.png' %}" class="relative w-28 h-auto contrast-110"
-                                alt="Broast">
+                            <img src="{% static 'img/Brost.png' %}" class="relative w-28 h-auto" alt="Broast"
+                                loading="eager" fetchpriority="high"
+                                style="opacity: 1 !important; visibility: visible !important;">
                         </div>
                     </div>
                     {% elif 'MOCKTAIL' in category.name|upper %}
                     <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
                         <div class="relative inline-block">
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                            </div>
-                            <img src="{% static 'img/Mocktails.png' %}" class="relative w-28 h-auto contrast-110"
-                                alt="Mocktails">
+                            <img src="{% static 'img/Mocktails.png' %}" class="relative w-28 h-auto" alt="Mocktails"
+                                loading="eager" fetchpriority="high"
+                                style="opacity: 1 !important; visibility: visible !important;">
                         </div>
                     </div>
                     {% elif 'HOT' in category.name|upper and 'CRISPY' in category.name|upper %}
                     <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
                         <div class="relative inline-block">
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                            </div>
-                            <img src="{% static 'img/Hotcrispy.png' %}" class="relative w-28 h-auto contrast-110"
-                                alt="Hotcrispy">
+                            <img src="{% static 'img/Hotcrispy.png' %}" class="relative w-28 h-auto" alt="Hotcrispy"
+                                loading="eager" fetchpriority="high"
+                                style="opacity: 1 !important; visibility: visible !important;">
                         </div>
                     </div>
                     {% endif %}
@@ -350,22 +340,18 @@
                         {% if 'LARGE' in item.name %}
                         <div class="mb-[-16px] translate-y-5 relative z-20 flex justify-start ml-2">
                             <div class="relative inline-block">
-                                <div
-                                    class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                                </div>
-                                <img src="{% static 'img/Largecombo.png' %}" class="relative w-32 h-auto contrast-125"
-                                    alt="Large Combo">
+                                <img src="{% static 'img/Largecombo.png' %}" class="relative w-32 h-auto"
+                                    alt="Large Combo" loading="eager" fetchpriority="high"
+                                    style="opacity: 1 !important; visibility: visible !important;">
                             </div>
                         </div>
                         {% endif %}
                         {% if 'MEDIUM' in item.name %}
                         <div class="mb-[-16px] translate-y-1 relative z-20 flex justify-start ml-2">
                             <div class="relative inline-block">
-                                <div
-                                    class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                                </div>
-                                <img src="{% static 'img/Mediumcombo.png' %}" class="relative w-32 h-auto contrast-125"
-                                    alt="Medium Combo">
+                                <img src="{% static 'img/Mediumcombo.png' %}" class="relative w-32 h-auto"
+                                    alt="Medium Combo" loading="eager" fetchpriority="high"
+                                    style="opacity: 1 !important; visibility: visible !important;">
                             </div>
                         </div>
                         {% endif %}
@@ -915,7 +901,7 @@
             div.innerHTML = `
             <div class="flex items-center">
                 <div class="w-12 h-12 rounded-lg bg-gray-900 border border-gray-600 flex-shrink-0 mr-3 overflow-hidden">
-                    <img src="${item.image || '/static/img/placeholder.png'}" class="w-full h-full object-cover">
+                    <img src="${item.image || '/static/img/placeholder.png'}" class="w-full h-full object-cover" loading="eager" fetchpriority="high">
                 </div>
                 <div>
                     <h3 class="font-poster text-lg text-white leading-tight">${item.name}</h3>
