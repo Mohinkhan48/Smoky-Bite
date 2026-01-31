@@ -3,7 +3,7 @@
 
     let lastOrderId = localStorage.getItem('last_notified_order');
     let soundEnabled = false;
-    const POLLING_INTERVAL = 10000;
+    const POLLING_INTERVAL = 3000; // Faster polling for 3-second response
 
     // Create the Toggle Button
     const toggleBtn = document.createElement('div');
@@ -58,35 +58,48 @@
         }
     };
 
-    // Sound Synthesis using Web Audio API (No files needed!)
-    function playDing() {
+    // Sound Synthesis: High-Loudness Triple-Alert (Optimized for attention)
+    function playNotification() {
         if (!soundEnabled) return;
 
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             const ctx = new AudioContext();
 
-            // Create oscillator for the main tone
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
+            function chime(freq, startTime, duration) {
+                // Stack two oscillators for a much louder, richer harmonic sound
+                const osc1 = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
+                const gain = ctx.createGain();
 
-            // High pitch service bell frequency (1760Hz)
-            osc.frequency.setValueAtTime(1760, ctx.currentTime);
-            osc.type = 'sine';
+                osc1.type = 'sine';
+                osc2.type = 'square'; // Square wave adds a "buzz" that makes it much louder to humans
 
-            // Envelope: Percussive "Ding"
-            gain.gain.setValueAtTime(0, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.01);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.0);
+                osc1.frequency.setValueAtTime(freq, startTime);
+                osc2.frequency.setValueAtTime(freq, startTime);
 
-            osc.connect(gain);
-            gain.connect(ctx.destination);
+                // Higher gain for maximum loudness (0.6 is very loud for Web Audio)
+                gain.gain.setValueAtTime(0, startTime);
+                gain.gain.linearRampToValueAtTime(0.6, startTime + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
 
-            osc.start();
-            osc.stop(ctx.currentTime + 1.0);
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(ctx.destination);
 
-            // Cleanup context after sound finishes
-            setTimeout(() => ctx.close(), 1200);
+                osc1.start(startTime);
+                osc2.start(startTime);
+                osc1.stop(startTime + duration);
+                osc2.stop(startTime + duration);
+            }
+
+            // High-Loudness Triple Chime (D6 - F#6 - A6)
+            chime(1174.66, ctx.currentTime, 0.4);          // D6
+            chime(1479.98, ctx.currentTime + 0.15, 0.45);   // F#6
+            chime(1760.00, ctx.currentTime + 0.30, 0.6);    // A6
+
+            // Final safety cleanup
+            setTimeout(() => ctx.close(), 2000);
         } catch (e) {
             console.error("Audio synthesis failed:", e);
         }
@@ -102,7 +115,7 @@
             toggleBtn.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.4)';
             text.style.color = "#000";
             icon.style.filter = 'grayscale(0) opacity(1)';
-            playDing();
+            playNotification();
         } else {
             text.innerText = "NOTIFICATIONS: OFF";
             toggleBtn.style.background = 'rgba(255, 255, 255, 0.05)';
@@ -160,23 +173,37 @@
     async function checkNewOrders() {
         try {
             const response = await fetch('/api/latest_order/');
-            if (!response.ok) return;
+            if (!response.ok) {
+                console.error("Polling API Error:", response.status);
+                return;
+            }
             const data = await response.json();
 
+            // Helpful logging for your console
+            console.log("SMOKY BITES POLLING:", data.latest_id, "| Last Notified:", lastOrderId);
+
             if (data.latest_id) {
+                // Ensure we have the latest from other tabs
+                const savedLastId = localStorage.getItem('last_notified_order');
+                if (savedLastId) lastOrderId = savedLastId;
+
                 if (!lastOrderId) {
+                    console.log("Initializing first order ID tracking...");
                     lastOrderId = data.latest_id;
                     localStorage.setItem('last_notified_order', lastOrderId);
-                } else if (data.latest_id !== lastOrderId) {
+                } else if (String(data.latest_id) !== String(lastOrderId)) {
+                    console.log("!!! NEW ORDER DETECTED !!! ->", data.latest_id);
                     lastOrderId = data.latest_id;
                     localStorage.setItem('last_notified_order', lastOrderId);
                     if (soundEnabled) {
-                        playDing();
+                        playNotification();
+                    } else {
+                        console.warn("New order detected, but NOTIFICATIONS are currently OFF.");
                     }
                 }
             }
         } catch (error) {
-            console.error("Polling error:", error);
+            console.error("Polling network error:", error);
         }
     }
 
