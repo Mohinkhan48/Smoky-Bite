@@ -584,6 +584,7 @@
 
     function hideModal(id) {
         const modal = document.getElementById(id);
+        if (!modal) return;
         modal.classList.add('translate-y-full');
         setTimeout(() => {
             modal.classList.add('invisible');
@@ -692,8 +693,14 @@
                 document.getElementById('upi-order-id').innerText = '#' + data.order_id;
                 document.getElementById('upi-qr-image').src = data.qr_url;
 
-                // Show the QR Modal directly (Like before)
-                hideModal('payment-modal');
+                // Direct Pay on Mobile
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                if (isMobile && data.upi_uri) {
+                    window.location.href = data.upi_uri;
+                }
+
+                // Show the QR/Confirmation Modal directly
+                hideModal('cart-modal');
                 showModal('upi-modal');
 
             } else {
