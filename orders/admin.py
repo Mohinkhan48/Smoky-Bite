@@ -10,7 +10,9 @@ import uuid
 
 class SmokyBitesAdminSite(admin.AdminSite):
     site_header = "SMOKY BITES ADMIN"
+    site_title = "SMOKY BITES POS"
     index_template = "admin/index.html"
+    app_index_template = "admin/index.html"
 
     def get_stats_context(self, request):
         query_date = request.GET.get('date')

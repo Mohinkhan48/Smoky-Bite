@@ -462,111 +462,42 @@
             </div>
         </div>
 
-        <div class="p-4 bg-gray-900 border-t border-gray-800">
-            <div class="flex justify-between text-xl font-poster text-white mb-4">
-                <span>TOTAL TO PAY</span>
-                <span id="cart-modal-total" class="text-yellow-400">₹0</span>
+        <div class="p-6 bg-gray-900 border-t border-gray-800">
+            <!-- Name/Phone Input (Inside Cart now) -->
+            <div class="mb-6" id="name-input-container">
+                <label for="customer-name" class="block text-yellow-400 font-poster text-lg mb-2 uppercase">Your
+                    Name</label>
+                <input type="text" id="customer-name" placeholder="John Doe"
+                    class="w-full bg-gray-800 text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-yellow-500 font-bold mb-4">
+
+                <label for="customer-number" class="block text-yellow-400 font-poster text-lg mb-2 uppercase">Phone
+                    Number</label>
+                <input type="tel" id="customer-number" placeholder="9876543210"
+                    class="w-full bg-gray-800 text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-yellow-500 font-bold">
             </div>
-            <button onclick="openPaymentSelection()"
-                class="w-full bg-yellow-500 text-black font-poster text-2xl py-3 rounded-xl hover:bg-yellow-400 transition transform active:scale-95 shadow-lg">
-                PROCEED TO PAYMENT
-            </button>
+
+            <div class="flex justify-between text-2xl font-poster text-white mb-6">
+                <span>TOTAL</span>
+                <span id="cart-modal-total" class="text-yellow-400 font-bold">₹0</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="processCashPayment(this, event)"
+                    class="bg-gray-800 border border-gray-700 text-white font-poster text-xl py-4 rounded-xl hover:bg-gray-700 transition active:scale-95 flex flex-col items-center justify-center">
+                    <span class="text-xs text-gray-400 mb-1">PAY WITH</span>
+                    CASH
+                </button>
+                <button onclick="initiateUpiPayment(this, event)"
+                    class="bg-yellow-500 border border-yellow-600 text-black font-poster text-xl py-4 rounded-xl hover:bg-yellow-400 transition active:scale-95 flex flex-col items-center justify-center">
+                    <span class="text-xs text-black opacity-60 mb-1">PAY WITH</span>
+                    UPI
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- 2. Payment Selection Modal -->
-<div id="payment-modal"
-    class="fixed inset-0 z-[70] transform translate-y-full transition-transform duration-300 invisible">
-    <div class="absolute inset-0 bg-black bg-opacity-90 backdrop-blur-md" onclick="closePaymentSelection()"></div>
-    <div
-        class="absolute bottom-0 left-0 right-0 max-w-[420px] md:max-w-[520px] lg:max-w-[600px] mx-auto bg-[#111] border-t-4 border-yellow-500 rounded-t-3xl min-h-[50vh] flex flex-col p-8">
 
-        <h2 class="font-poster text-3xl text-white text-center mb-8">CHOOSE PAYMENT</h2>
-        {% csrf_token %}
-
-        <div class="mb-6" id="name-input-container">
-            <label for="customer-name" class="block text-white font-poster text-lg mb-2">ENTER YOUR NAME</label>
-            <input type="text" id="customer-name" placeholder="John Doe"
-                class="w-full bg-gray-800 text-white border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-yellow-500 font-bold mb-4">
-
-            <label for="customer-number" class="block text-white font-poster text-lg mb-2">PHONE NUMBER</label>
-            <input type="tel" id="customer-number" placeholder="9876543210"
-                class="w-full bg-gray-800 text-white border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-yellow-500 font-bold">
-        </div>
-
-        <div class="grid grid-cols-2 gap-6 mb-8">
-            <button onclick="processCashPayment(this, event)"
-                class="bg-gray-800 border-2 border-gray-600 rounded-2xl p-6 flex flex-col items-center justify-center hover:border-yellow-500 hover:bg-gray-700 transition group btn-smooth">
-                <svg class="w-12 h-12 text-gray-400 mb-3 group-hover:text-yellow-500" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
-                    </path>
-                </svg>
-                <span class="font-poster text-xl text-white">CASH</span>
-                <span class="text-xs text-gray-500 mt-1">Pay at Counter</span>
-            </button>
-            <button onclick="initiateUpiPayment(this, event)"
-                class="bg-gray-800 border-2 border-gray-600 rounded-2xl p-6 flex flex-col items-center justify-center hover:border-yellow-500 hover:bg-gray-700 transition group btn-smooth">
-                <svg class="w-12 h-12 text-gray-400 mb-3 group-hover:text-yellow-500" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 14.5v.01M12 18.5v.01M12 12.5v.01M12 8.5v.01M12 20.5v.01M12 16.5v.01">
-                    </path>
-                </svg>
-                <span class="font-poster text-xl text-white">UPI</span>
-                <span class="text-xs text-gray-500 mt-1">Scan QR Code</span>
-            </button>
-        </div>
-
-        <button onclick="closePaymentSelection()"
-            class="mt-auto w-full border border-gray-600 text-gray-400 py-3 rounded-xl hover:text-white uppercase tracking-widest text-sm">Cancel</button>
-    </div>
-</div>
-
-<!-- 2.5. UPI App Chooser Modal -->
-<div id="upi-app-modal"
-    class="fixed inset-0 z-[75] transform translate-y-full transition-transform duration-300 invisible">
-    <div class="absolute inset-0 bg-black bg-opacity-90 backdrop-blur-md" onclick="closeUpiAppModal()"></div>
-    <div
-        class="absolute bottom-0 left-0 right-0 max-w-[420px] md:max-w-[520px] lg:max-w-[600px] mx-auto bg-[#111] border-t-4 border-yellow-500 rounded-t-3xl min-h-[40vh] flex flex-col p-8">
-
-        <h2 class="font-poster text-3xl text-white text-center mb-6 tracking-widest">PAY USING APP</h2>
-
-        <div class="grid grid-cols-1 gap-4 mb-8">
-            <!-- PhonePe -->
-            <button onclick="payWithApp('phonepe')"
-                class="bg-[#5f259f] text-white rounded-xl p-4 flex items-center justify-between hover:brightness-110 transition btn-smooth">
-                <span class="font-bold text-lg ml-2">PhonePe</span>
-                <span class="text-xs opacity-80 uppercase tracking-tighter font-bold">Recommended</span>
-            </button>
-
-            <!-- GPay -->
-            <button onclick="payWithApp('gpay')"
-                class="bg-white text-gray-800 rounded-xl p-4 flex items-center justify-between hover:bg-gray-100 transition btn-smooth">
-                <span class="font-bold text-lg ml-2">Google Pay</span>
-                <span class="text-xs opacity-60 uppercase tracking-tighter font-bold">Fast & Secure</span>
-            </button>
-
-            <!-- Paytm -->
-            <button onclick="payWithApp('paytm')"
-                class="bg-[#00baf2] text-white rounded-xl p-4 flex items-center justify-between hover:brightness-110 transition btn-smooth">
-                <span class="font-bold text-lg ml-2">Paytm</span>
-                <span class="text-xs opacity-80 uppercase tracking-tighter font-bold">Wallet & UPI</span>
-            </button>
-
-            <!-- Any Other / QR -->
-            <button onclick="showQrModal()"
-                class="bg-gray-800 border border-gray-600 text-yellow-500 rounded-xl p-4 flex items-center justify-center hover:bg-gray-700 transition btn-smooth">
-                <span class="font-bold text-lg">OTHER APP / SCAN QR</span>
-            </button>
-        </div>
-
-        <button onclick="closeUpiAppModal()"
-            class="mt-auto w-full border border-gray-600 text-gray-400 py-3 rounded-xl hover:text-white uppercase tracking-widest text-sm">Back</button>
-    </div>
-</div>
 
 <!-- 3. UPI QR Code Modal -->
 <div id="upi-modal" class="fixed inset-0 z-[80] transform translate-y-full transition-transform duration-300 invisible">
@@ -663,6 +594,7 @@
         const modal = document.getElementById('cart-modal');
         if (modal.classList.contains('translate-y-full')) {
             renderCartList();
+            checkCustomerName();
             showModal('cart-modal');
         } else {
             hideModal('cart-modal');
@@ -671,12 +603,6 @@
 
     // --- Payment Flow Logic ---
 
-    function openPaymentSelection() {
-        if (cart.length === 0) return alert("Cart is empty!");
-        hideModal('cart-modal');
-        showModal('payment-modal');
-        checkCustomerName();
-    }
 
     function checkCustomerName() {
         const savedName = localStorage.getItem('smokybites_customer_name');
@@ -705,10 +631,6 @@
         }
     }
 
-    function closePaymentSelection() {
-        hideModal('payment-modal');
-        showModal('cart-modal');
-    }
 
     // --- New UPI Flow ---
     async function initiateUpiPayment(btnElement, event) {
@@ -770,9 +692,9 @@
                 document.getElementById('upi-order-id').innerText = '#' + data.order_id;
                 document.getElementById('upi-qr-image').src = data.qr_url;
 
-                // Show the App Chooser Modal
+                // Show the QR Modal directly (Like before)
                 hideModal('payment-modal');
-                showModal('upi-app-modal');
+                showModal('upi-modal');
 
             } else {
                 alert("Failed to initiate payment");
@@ -812,47 +734,11 @@
         }
     }
 
-    function closeUpiAppModal() {
-        hideModal('upi-app-modal');
-        showModal('payment-modal');
-    }
-
-    function showQrModal() {
-        hideModal('upi-app-modal');
-        showModal('upi-modal');
-    }
-
-    function payWithApp(appName) {
-        if (!cachedUpiUri) return;
-
-        let appUri = cachedUpiUri;
-        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-
-        if (appName === 'phonepe') {
-            appUri = cachedUpiUri.replace('upi://', 'phonepe://');
-        } else if (appName === 'paytm') {
-            appUri = cachedUpiUri.replace('upi://', 'paytmmp://');
-        } else if (appName === 'gpay') {
-            if (isIOS) {
-                appUri = cachedUpiUri.replace('upi://', 'tez://upi/');
-            }
-            // On Android, generic upi:// is usually fine for GPay, but we can't force it easily without intent://
-        }
-
-        console.log("Opening App URI:", appUri);
-        window.location.href = appUri;
-
-        // After opening the app, wait a bit and show the final "I have paid" screen (the QR modal)
-        // so they can confirm the payment after returning from the app.
-        setTimeout(() => {
-            showQrModal();
-        }, 1500);
-    }
 
     function closeUpiModal() {
         // Technically shouldn't close without paying, but if they do:
         hideModal('upi-modal');
-        showModal('upi-app-modal'); // Go back to chooser instead of payment selection
+        showModal('cart-modal');
     }
 
     // --- Cash Submission Logic ---

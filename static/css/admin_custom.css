@@ -231,3 +231,72 @@ fieldset.module h2 {
     opacity: 1;
     transform: scale(1.05);
 }
+
+/* DASHBOARD STATS */
+.stats-header {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stats-card {
+    background: #1a1a1a;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card.orders {
+    border-left: 6px solid var(--primary-yellow);
+}
+
+.stats-card.revenue {
+    border-left: 6px solid #2ecc71;
+}
+
+.stats-card.profit {
+    border-left: 6px solid #3498db;
+}
+
+.stats-card .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+
+.label-orders {
+    color: var(--primary-yellow);
+}
+
+.label-revenue {
+    color: #2ecc71;
+}
+
+.label-profit {
+    color: #3498db;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+}
+
+.val-revenue {
+    color: #2ecc71;
+}
+
+.val-profit {
+    color: #3498db;
+}
