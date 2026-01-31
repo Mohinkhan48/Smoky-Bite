@@ -155,6 +155,7 @@ class OrderAdmin(admin.ModelAdmin):
     generate_profit_report.short_description = "💰 Generate Profit Report for selected"
 
     class Media:
+        js = ('js/admin_notifications.js',)
         css = {
             'all': ('css/admin_custom.css',)
         }
