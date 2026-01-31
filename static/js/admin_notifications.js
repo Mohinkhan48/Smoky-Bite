@@ -3,7 +3,7 @@
 
     let lastOrderId = localStorage.getItem('last_notified_order');
     let soundEnabled = false;
-    const POLLING_INTERVAL = 3000; // Faster polling for 3-second response
+    const POLLING_INTERVAL = 10000; // Poll every 10 seconds
 
     // Create the Toggle Button
     const toggleBtn = document.createElement('div');
@@ -116,6 +116,7 @@
             text.style.color = "#000";
             icon.style.filter = 'grayscale(0) opacity(1)';
             playNotification();
+            checkNewOrders(); // Trigger immediate check when turned ON
         } else {
             text.innerText = "NOTIFICATIONS: OFF";
             toggleBtn.style.background = 'rgba(255, 255, 255, 0.05)';
@@ -128,6 +129,7 @@
 
     // Injection Logic: Target the header area robustly
     function injectToggle() {
+        if (document.getElementById('notif-toggle')) return;
         console.log("Attempting to inject toggle...");
         // Search multiple possible targets in the admin header
         const targets = [
@@ -171,6 +173,9 @@
     }
 
     async function checkNewOrders() {
+        // Only hit the server if notifications are ON and tab is visible
+        if (!soundEnabled || document.hidden) return;
+
         try {
             const response = await fetch('/api/latest_order/');
             if (!response.ok) {
@@ -209,4 +214,29 @@
 
     setInterval(checkNewOrders, POLLING_INTERVAL);
     checkNewOrders();
+
+    // Delivery Toggle UI Helper (Strict)
+    window.toggleStrictOptions = function (idPrefix) {
+        const el = document.getElementById(idPrefix + '-options');
+        if (el) {
+            const isHidden = el.style.display === 'none';
+            document.querySelectorAll('.strict-options').forEach(c => c.style.display = 'none');
+            if (isHidden) el.style.display = 'flex';
+        }
+    };
+
+    window.confirmStatusUpdate = function (url, statusName) {
+        window.location.href = url;
+    };
+
+    // Delivery Toggle UI Helper
+    window.toggleDeliveryOptions = function (idPrefix) {
+        const el = document.getElementById(idPrefix + '-options');
+        if (el) {
+            const isHidden = el.style.display === 'none';
+            // Hide all others first for clean UI
+            document.querySelectorAll('.delivery-toggle-container').forEach(c => c.style.display = 'none');
+            if (isHidden) el.style.display = 'flex';
+        }
+    };
 })();

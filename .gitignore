@@ -1,26 +1,30 @@
 # Python
-*.pyc
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # Virtual environment
 venv/
 
-# Environment variables
-.env
+# Django
+db.sqlite3
+db_*.sqlite3
 
-# Database (ALL sqlite DBs)
-*.sqlite3
-
-# Django static collect
+# Collected static files
 staticfiles/
 
-# OS files
+# Logs
+*.log
+
+# OS
 .DS_Store
 Thumbs.db
 
-# Local debug helper scripts
-check_items_current.py
-ensure_b64.py
-ensure_b64_v2.py
-update_content.py
-
+# Debug / helper scripts
+debug_*.py
+check_*.py
+fix_*.py
+force_*.py
+verify_*.py
+run_*.bat

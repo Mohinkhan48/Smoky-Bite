@@ -4,13 +4,15 @@ from django.db.models import Sum, F
 from .models import Category, MenuItem, Order, OrderItem
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.admin import UserAdmin, GroupAdmin
+from django.urls import path
+from django.shortcuts import redirect
 import uuid
 
 class SmokyBitesAdminSite(admin.AdminSite):
     site_header = "SMOKY BITES ADMIN"
     index_template = "admin/index.html"
 
-    def index(self, request, extra_context=None):
+    def get_stats_context(self, request):
         query_date = request.GET.get('date')
         if query_date:
             try:
@@ -28,22 +30,28 @@ class SmokyBitesAdminSite(admin.AdminSite):
 
         total_revenue = orders_today.aggregate(total=Sum('total_amount'))['total'] or 0
         
-        # Calculate profit for the target date
         total_profit = OrderItem.objects.filter(
             order__created_at__date=target_date
         ).aggregate(
             profit=Sum((F('price') - F('cost_price')) * F('quantity'))
         )['profit'] or 0
 
-        # Pre-format as rounded strings for bulletproof template rendering
-        extra_context = extra_context or {}
-        extra_context['daily_stats'] = {
+        return {
             'total_orders': total_items,
             'total_revenue': f"{total_revenue:.2f}",
             'total_profit': f"{total_profit:.2f}",
             'selected_date': target_date,
         }
+
+    def index(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['daily_stats'] = self.get_stats_context(request)
         return super().index(request, extra_context)
+
+    def app_index(self, request, app_label, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['daily_stats'] = self.get_stats_context(request)
+        return super().app_index(request, app_label, extra_context)
 
 admin_site = SmokyBitesAdminSite(name='smoky_admin')
 
@@ -63,7 +71,18 @@ class MenuItemAdmin(admin.ModelAdmin):
         from django.utils.html import format_html
         from django.urls import reverse
         url = reverse(f'admin:orders_menuitem_change', args=[obj.pk])
-        return format_html('<a class="button" href="{}" style="background:#3498db !important; padding:4px 8px; font-size:10px;">Item Cost</a>', url)
+        return format_html(
+            '<a class="button" href="{}" style="'
+            'background: #3498db !important; '
+            'padding: 5px 12px; '
+            'font-size: 10px; '
+            'border-radius: 50px; '
+            'font-weight: 900; '
+            'letter-spacing: 1px; '
+            'box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); '
+            'transition: all 0.3s; '
+            'display: inline-block;'
+            '">ITEM COST</a>', url)
     item_cost_tool.short_description = "Cost Tool"
 
 class OrderItemInline(admin.TabularInline):
@@ -76,11 +95,43 @@ class OrderItemInline(admin.TabularInline):
 @admin.register(Order, site=admin_site)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('order_number', 'customer_name_bold', 'phone_link', 'time', 'pay_method', 'pay_status', 'order_status', 'amount_display')
-    list_filter = ('status', 'payment_status', 'payment_method', 'created_at')
+    list_per_page = 20
+    
+    class RestrictStatusFilter(admin.SimpleListFilter):
+        title = 'Status'
+        parameter_name = 'status'
+        def lookups(self, request, model_admin):
+            return [
+                ('CONFIRMED', 'Confirmed'),
+                ('DELIVERED', 'Delivered'),
+                ('UNDELIVERED', 'Undelivered'),
+            ]
+        def queryset(self, request, queryset):
+            if self.value():
+                return queryset.filter(status=self.value())
+            return queryset
+
+    list_filter = (RestrictStatusFilter, 'payment_status', 'payment_method', 'created_at')
     search_fields = ('order_id', 'customer_name', 'customer_number')
     ordering = ('-created_at',)
-    list_per_page = 20
-    actions = ['generate_profit_report']
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'toggle-delivery/<int:order_id>/<str:new_status>/',
+                self.admin_site.admin_view(self.toggle_delivery_status),
+                name='toggle_delivery_status',
+            ),
+        ]
+        return custom_urls + urls
+
+    def toggle_delivery_status(self, request, order_id, new_status):
+        order = Order.objects.get(pk=order_id)
+        if new_status in ['DELIVERED', 'UNDELIVERED']:
+            order.status = new_status
+            order.save()
+        return redirect(request.META.get('HTTP_REFERER', 'admin:orders_order_changelist'))
     
     inlines = [OrderItemInline]
     
@@ -100,6 +151,19 @@ class OrderAdmin(admin.ModelAdmin):
     )
     
     readonly_fields = ('order_id', 'created_at')
+
+    def get_fieldsets(self, request, obj=None):
+        return super().get_fieldsets(request, obj)
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == "status":
+            kwargs['choices'] = [
+                ('CONFIRMED', 'Confirmed'),
+                ('DELIVERED', 'Delivered'),
+                ('UNDELIVERED', 'Undelivered'),
+            ]
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
+
 
     def order_number(self, obj):
         return obj.order_id[:8].upper()
@@ -137,8 +201,33 @@ class OrderAdmin(admin.ModelAdmin):
 
     def order_status(self, obj):
         from django.utils.html import format_html
+        from django.urls import reverse
+        
         cls = f"status-badge status-{obj.status.lower()}"
-        return format_html('<span class="{}">{}</span>', cls, obj.status)
+        status_html = format_html('<span class="{}">{}</span>', cls, obj.status)
+        
+        if obj.status in ['CONFIRMED', 'DELIVERED', 'UNDELIVERED']:
+            # Minimal inline options that don't change layout
+            id_prefix = f"order-{obj.pk}"
+            delivered_url = reverse('admin:toggle_delivery_status', args=[obj.pk, 'DELIVERED'])
+            undelivered_url = reverse('admin:toggle_delivery_status', args=[obj.pk, 'UNDELIVERED'])
+            
+            return format_html(
+                '<div class="status-click-wrapper" onclick="toggleStrictOptions(\'{}\')">'
+                '{}'
+                '<div id="{}-options" class="strict-options" style="display:none;">'
+                '<a href="#" onclick="confirmStatusUpdate(\'{}\', \'Delivered\'); return false;" class="opt-btn">Delivered</a>'
+                '<a href="#" onclick="confirmStatusUpdate(\'{}\', \'Undelivered\'); return false;" class="opt-btn">Undelivered</a>'
+                '</div>'
+                '</div>',
+                id_prefix,
+                status_html,
+                id_prefix,
+                delivered_url,
+                undelivered_url
+            )
+            
+        return status_html
     order_status.short_description = 'Status'
     order_status.admin_order_field = 'status'
 
@@ -157,7 +246,6 @@ class OrderAdmin(admin.ModelAdmin):
     generate_profit_report.short_description = "💰 Generate Profit Report for selected"
 
     class Media:
-        js = ('js/admin_notifications.js',)
         css = {
             'all': ('css/admin_custom.css',)
         }

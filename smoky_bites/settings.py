@@ -100,3 +100,12 @@ UPI_CONFIG = {
     'MERCHANT_NAME': 'SHAUL KHAN',
     'CURRENCY': 'INR',
 }
+
+# Hardcoded Admin Credentials
+HARDCODED_USERNAME = 'admin'
+HARDCODED_PASSWORD = 'password123'  # CHANGE THIS!
+
+AUTHENTICATION_BACKENDS = [
+    'orders.backends.HardcodedAuthBackend',
+    'django.contrib.auth.backends.ModelBackend', # Keep default for potential other users, or remove if strictly only hardcoded allowed
+]

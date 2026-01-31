@@ -390,7 +390,7 @@
 
 {% block usertools %}
 <div id="user-tools">
-    WELCOME, <strong>{{ user.get_username|upper }}</strong>.
+    WELCOME, <strong>{{ user.get_username|upper }}</strong>
     <a href="/">VIEW SITE</a> /
     <a href="{% url 'admin:password_change' %}">PASSWORD</a> /
     <form action="{% url 'admin:logout' %}" method="post" style="display:inline;">
