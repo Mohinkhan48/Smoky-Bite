@@ -7,4 +7,6 @@ urlpatterns = [
     path('place_order/', views.place_order, name='place_order'),
     path('order_success/<str:order_id>/', views.order_success, name='order_success'),
     path('api/latest_order/', views_notifications.get_latest_order_id, name='latest_order_id'),
+    path('api/dashboard_stats/', views.dashboard_stats_api, name='dashboard_stats_api'),
+    path('confirm_payment/', views.confirm_payment, name='confirm_payment'),
 ]

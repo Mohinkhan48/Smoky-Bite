@@ -59,6 +59,7 @@ admin_site = SmokyBitesAdminSite(name='smoky_admin')
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active')
     search_fields = ('name',)
+    actions = None
 
 @admin.register(MenuItem, site=admin_site)
 class MenuItemAdmin(admin.ModelAdmin):
@@ -114,6 +115,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = (RestrictStatusFilter, 'payment_status', 'payment_method', 'created_at')
     search_fields = ('order_id', 'customer_name', 'customer_number')
     ordering = ('-created_at',)
+    actions = None  # Smooth: Hide bulk actions
     
     def get_urls(self):
         urls = super().get_urls()

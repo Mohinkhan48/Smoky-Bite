@@ -34,21 +34,24 @@
             <div
                 style="color: #ffd700; font-size: 0.8rem; text-transform: uppercase; font-weight: 900; margin-bottom: 8px;">
                 🛒 Orders Received</div>
-            <div style="font-size: 2.5rem; font-weight: 900; color: #fff;">{{ daily_stats.total_orders }}</div>
+            <div id="stat-orders" style="font-size: 2.5rem; font-weight: 900; color: #fff;">{{ daily_stats.total_orders
+                }}</div>
         </div>
         <div class="stats-card"
             style="background: #1a1a1a; padding: 25px; border-radius: 12px; border-left: 6px solid #2ecc71; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
             <div
                 style="color: #2ecc71; font-size: 0.8rem; text-transform: uppercase; font-weight: 900; margin-bottom: 8px;">
                 💰 Gross Revenue</div>
-            <div style="font-size: 2.5rem; font-weight: 900; color: #2ecc71;">₹{{ daily_stats.total_revenue }}</div>
+            <div id="stat-revenue" style="font-size: 2.5rem; font-weight: 900; color: #2ecc71;">₹{{
+                daily_stats.total_revenue }}</div>
         </div>
         <div class="stats-card"
             style="background: #1a1a1a; padding: 25px; border-radius: 12px; border-left: 6px solid #3498db; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
             <div
                 style="color: #3498db; font-size: 0.8rem; text-transform: uppercase; font-weight: 900; margin-bottom: 8px;">
                 📈 Expected Profit</div>
-            <div style="font-size: 2.5rem; font-weight: 900; color: #3498db;">₹{{ daily_stats.total_profit }}</div>
+            <div id="stat-profit" style="font-size: 2.5rem; font-weight: 900; color: #3498db;">₹{{
+                daily_stats.total_profit }}</div>
         </div>
     </div>
 
@@ -61,8 +64,8 @@
         <table style="width: 100%;">
             <caption>
                 <a href="{{ app.app_url }}" class="section"
-                    title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">Manage
-                    menu</a>
+                    title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">{{
+                    app.name }}</a>
             </caption>
             {% for model in app.models %}
             <tr class="model-{{ model.object_name|lower }}">
@@ -95,38 +98,5 @@
     {% else %}
     <p>{% translate 'You don’t have permission to view or edit anything.' %}</p>
     {% endif %}
-</div>
-{% endblock %}
-
-{% block sidebar %}
-<div id="content-related">
-    <div class="module" id="recent-actions-module">
-        <h2>{% translate 'Recent actions' %}</h2>
-        <h3>{% translate 'My actions' %}</h3>
-        {% load log %}
-        {% get_admin_log 10 as admin_log for_user user %}
-        {% if not admin_log %}
-        <p>{% translate 'None available' %}</p>
-        {% else %}
-        <ul class="actionlist">
-            {% for entry in admin_log %}
-            <li
-                class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
-                {% if entry.is_deletion or not entry.get_admin_url %}
-                {{ entry.object_repr }}
-                {% else %}
-                <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
-                {% endif %}
-                <br>
-                {% if entry.content_type %}
-                <span class="mini quiet">{% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}</span>
-                {% else %}
-                <span class="mini quiet">{% translate 'Unknown content' %}</span>
-                {% endif %}
-            </li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-    </div>
 </div>
 {% endblock %}

@@ -176,6 +176,16 @@ fieldset.module h2 {
     transition: all 0.2s;
 }
 
+/* Stats Card Hover */
+.stats-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6) !important;
+}
+
 /* Delivery Toggle Buttons */
 .delivery-toggle-container {
     display: flex;

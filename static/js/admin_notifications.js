@@ -182,46 +182,60 @@
     }
 
     async function checkNewOrders() {
-        // Only hit the server if notifications are ON and tab is visible
         if (!soundEnabled || document.hidden) return;
 
         try {
+            // 1. Fetch Latest Order ID (for sound/auto-refresh part)
             const response = await fetch('/api/latest_order/');
-            if (!response.ok) {
-                console.error("Polling API Error:", response.status);
-                return;
-            }
-            const data = await response.json();
+            if (response.ok) {
+                const data = await response.json();
+                if (data.latest_id) {
+                    const savedLastId = localStorage.getItem('last_notified_order');
+                    if (savedLastId) lastOrderId = savedLastId;
 
-            // Helpful logging for your console
-            console.log("SMOKY BITES POLLING:", data.latest_id, "| Last Notified:", lastOrderId);
-
-            if (data.latest_id) {
-                // Ensure we have the latest from other tabs
-                const savedLastId = localStorage.getItem('last_notified_order');
-                if (savedLastId) lastOrderId = savedLastId;
-
-                if (!lastOrderId) {
-                    console.log("Initializing first order ID tracking...");
-                    lastOrderId = data.latest_id;
-                    localStorage.setItem('last_notified_order', lastOrderId);
-                } else if (String(data.latest_id) !== String(lastOrderId)) {
-                    console.log("!!! NEW ORDER DETECTED !!! ->", data.latest_id);
-                    lastOrderId = data.latest_id;
-                    localStorage.setItem('last_notified_order', lastOrderId);
-                    if (soundEnabled) {
+                    if (!lastOrderId) {
+                        lastOrderId = data.latest_id;
+                        localStorage.setItem('last_notified_order', lastOrderId);
+                    } else if (String(data.latest_id) !== String(lastOrderId)) {
+                        lastOrderId = data.latest_id;
+                        localStorage.setItem('last_notified_order', lastOrderId);
                         playNotification();
 
-                        // AUTO-REFRESH: If on the "Your orders" list page, refresh to show the new order
+                        // Only auto-refresh if on the ORDERS LIST page
                         const path = window.location.pathname;
                         if (path.includes('/admin/orders/order/') && !path.includes('/add/') && !path.match(/\/\d+\//)) {
-                            console.log("New order detected on list page. Auto-refreshing...");
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1500); // 1.5s delay so the sound plays first
+                            setTimeout(() => window.location.reload(), 1500);
                         }
-                    } else {
-                        console.warn("New order detected, but NOTIFICATIONS are currently OFF.");
+                    }
+                }
+            }
+
+            // 2. Fetch Dashboard Stats (if on index page)
+            if (window.location.pathname === '/admin/' || window.location.pathname === '/admin/index.html') {
+                const statsRes = await fetch('/api/dashboard_stats/');
+                if (statsRes.ok) {
+                    const stats = await statsRes.json();
+                    const els = {
+                        'stat-orders': stats.total_orders,
+                        'stat-revenue': '₹' + stats.total_revenue,
+                        'stat-profit': '₹' + stats.total_profit
+                    };
+                    for (const [id, val] of Object.entries(els)) {
+                        const el = document.getElementById(id);
+                        if (el && el.innerText !== String(val)) {
+                            el.style.transition = 'all 0.5s';
+                            el.style.transform = 'scale(1.2)';
+                            el.style.color = '#ffd700';
+                            setTimeout(() => {
+                                el.innerText = val;
+                                el.style.transform = 'scale(1)';
+                                // Restore color after a bit
+                                setTimeout(() => {
+                                    el.style.color = id === 'stat-revenue' ? '#2ecc71' :
+                                        id === 'stat-profit' ? '#3498db' : '#fff';
+                                }, 500);
+                            }, 300);
+                        }
                     }
                 }
             }

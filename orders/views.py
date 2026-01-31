@@ -100,12 +100,14 @@ def place_order(request):
             if not cart_items:
                 return JsonResponse({'error': 'Cart is empty'}, status=400)
 
-            # Create Order (always PENDING first)
+            # Create Order (Wait for payment for UPI, Confirm immediately for CASH)
             payment_method = data.get('payment_method', 'CASH')
+            initial_status = 'CONFIRMED' if payment_method == 'CASH' else 'PENDING'
+            
             customer_name = data.get('customer_name', 'Guest')
             customer_number = data.get('customer_number', '')
             order = Order.objects.create(
-                status='CONFIRMED', 
+                status=initial_status, 
                 payment_method=payment_method, 
                 payment_status='PENDING', 
                 customer_name=customer_name,
@@ -146,7 +148,8 @@ def place_order(request):
                 merchant_name = upi_conf.get('MERCHANT_NAME', 'Smoky Bites')
                 merchant_quoted = quote(merchant_name)
                 amount = float(total)
-                mc = upi_conf.get('MC', '5411') # Business Merchant Category Code
+                mc = upi_conf.get('MC', '5411')
+                currency = upi_conf.get('CURRENCY', 'INR')
                 
                 # BUSINESS MODE: 
                 # For registered merchants, adding 'mc' and a concise 'tr' 
@@ -189,6 +192,7 @@ def confirm_payment(request):
             
             order.payment_method = 'UPI'
             order.payment_status = 'PAID'
+            order.status = 'CONFIRMED'  # NOW it is showable on dashboard
             order.save()
             
             return JsonResponse({'status': 'success'})
@@ -201,6 +205,37 @@ def confirm_payment(request):
 def order_success(request, order_id):
     order = get_object_or_404(Order, order_id=order_id)
     return render(request, 'order_success.html', {'order': order})
+
+def dashboard_stats_api(request):
+    """API to fetch financial stats for real-time dashboard updates."""
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+        
+    from django.utils import timezone
+    from django.db.models import Sum, F
+    
+    target_date = timezone.now().date()
+    orders_today = Order.objects.filter(created_at__date=target_date, status='CONFIRMED')
+    
+    total_orders = OrderItem.objects.filter(
+        order__created_at__date=target_date,
+        order__status='CONFIRMED'
+    ).aggregate(total=Sum('quantity'))['total'] or 0
+
+    total_revenue = orders_today.aggregate(total=Sum('total_amount'))['total'] or 0
+    
+    total_profit = OrderItem.objects.filter(
+        order__created_at__date=target_date,
+        order__status='CONFIRMED'
+    ).aggregate(
+        profit=Sum((F('price') - F('cost_price')) * F('quantity'))
+    )['profit'] or 0
+
+    return JsonResponse({
+        'total_orders': total_orders,
+        'total_revenue': f"{total_revenue:.2f}",
+        'total_profit': f"{total_profit:.2f}"
+    })
 
 def get_menu_prices(request):
     """API for admin real-time total calculation"""
