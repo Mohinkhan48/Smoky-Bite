@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.core.management import call_command
 from .models import Category, MenuItem, Order, OrderItem
 
 def get_safe_category(name):
@@ -24,6 +25,14 @@ def get_safe_category(name):
         return primary
 
 def menu_view(request):
+    # --- AUTO-HEALING: Ensure database tables exist ---
+    try:
+        # Check if the tables actually exist by querying Category
+        Category.objects.exists()
+    except Exception:
+        # Tables are missing (likely fresh Render deploy). Run migrations now.
+        call_command('migrate', interactive=False)
+        
     # Only populate if no categories exist to save database IO in production
     if not Category.objects.exists():
         menu = {
