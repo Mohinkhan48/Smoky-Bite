@@ -518,8 +518,8 @@
             <p class="text-xs text-gray-400 mb-6 font-bold">Scan & Pay using any UPI app</p>
 
             <button onclick="confirmUpiPayment(event)"
-                class="w-full bg-green-500 text-white font-poster text-xl py-3 rounded-xl shadow-lg hover:bg-green-600 transition animate-pulse">
-                I HAVE PAID
+                class="w-full bg-green-500 text-white font-poster text-xl py-3 rounded-xl shadow-lg hover:bg-green-600 transition">
+                FINISH TRANSACTION
             </button>
         </div>
     </div>
@@ -699,6 +699,12 @@
                     window.location.href = data.upi_uri;
                 }
 
+                // CLEAR CART IMMEDIATELY - The order is safely in the database now.
+                // This prevents redundant orders if the user goes back or refreshes.
+                cart = [];
+                localStorage.removeItem('smokybites_cart');
+                updateCartBadge(); // Update the UI floating quantity
+
                 // Show the QR/Confirmation Modal directly
                 hideModal('cart-modal');
                 showModal('upi-modal');
@@ -732,13 +738,14 @@
         });
 
         if (response.ok) {
-            localStorage.removeItem('smokybites_cart');
+            // Cart already cleared in initiateUpiPayment
             window.location.href = `/order_success/${currentOrderId}/`;
         } else {
             alert("Error confirming payment.");
-            btn.innerText = "I HAVE PAID";
+            btn.innerText = "FINISH TRANSACTION";
             btn.disabled = false;
         }
+
     }
 
 

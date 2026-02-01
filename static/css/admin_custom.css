@@ -324,6 +324,113 @@ fieldset.module h2 {
 
 /* MOBILE RESPONSIVENESS */
 @media (max-width: 768px) {
+
+    /* HEADER FIXES */
+    #header {
+        padding: 15px 10px !important;
+    }
+
+    #site-name {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 15px !important;
+        margin: 0 0 15px 0 !important;
+    }
+
+    #site-name a {
+        font-size: 1.4rem !important;
+        line-height: 1.2;
+    }
+
+    #notif-toggle {
+        margin: 5px auto !important;
+        display: flex !important;
+        width: fit-content;
+    }
+
+    /* TITLE FIXES */
+    #content h1 {
+        font-size: 1.5rem !important;
+        margin-bottom: 15px !important;
+    }
+
+    #user-tools {
+
+        position: static !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 12px !important;
+        border-radius: 8px;
+        font-size: 0.75rem !important;
+    }
+
+    #user-tools strong {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--primary-yellow);
+    }
+
+    #user-tools br {
+        display: none;
+    }
+
+    /* Hide any hardcoded breaks */
+
+    /* SEARCH FIXES */
+    #changelist-search {
+        background: #1a1a1a !important;
+        padding: 15px !important;
+        border-radius: 8px;
+        margin-bottom: 20px !important;
+    }
+
+    #changelist-search input[name="q"] {
+        width: 100% !important;
+        height: 44px !important;
+        background: #000 !important;
+        border: 1px solid #333 !important;
+        margin-bottom: 10px !important;
+        padding: 0 15px !important;
+        font-size: 14px !important;
+    }
+
+    #changelist-search input[type="submit"] {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* TABLE FIXES */
+    #changelist table {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    #changelist table thead th {
+        padding: 12px 6px !important;
+        font-size: 10px !important;
+    }
+
+    #changelist table tbody td,
+    #changelist table tbody th {
+        padding: 10px 5px !important;
+        font-size: 12px !important;
+    }
+
+    /* Fix for STATUS and TOTAL headings specifically */
+    .column-order_status,
+    .column-amount_display {
+        text-align: center !important;
+    }
+
+    .status-badge {
+        padding: 4px 10px !important;
+        min-width: 70px;
+        text-align: center;
+    }
+
     .stats-header {
         flex-direction: column;
         align-items: flex-start;

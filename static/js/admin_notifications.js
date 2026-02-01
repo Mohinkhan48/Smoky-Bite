@@ -29,8 +29,8 @@
     }
     toggleBtn.style.display = 'inline-flex';
     toggleBtn.style.alignItems = 'center';
-    toggleBtn.style.marginLeft = '20px';
     toggleBtn.style.padding = '6px 16px';
+
     toggleBtn.style.borderRadius = '50px';
     toggleBtn.style.background = 'rgba(255, 255, 255, 0.05)';
     toggleBtn.style.border = '1px solid rgba(255, 255, 255, 0.1)';

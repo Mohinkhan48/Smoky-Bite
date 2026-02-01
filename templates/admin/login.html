@@ -1,0 +1,165 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        background: #000 !important;
+    }
+
+    #container {
+        background: transparent !important;
+        width: 100%;
+        max-width: 400px;
+        padding: 0 20px;
+    }
+
+    #content {
+        background: #1a1a1a !important;
+        padding: 40px !important;
+        border-radius: 12px !important;
+        border: 1px solid #333 !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    #header,
+    .breadcrumbs {
+        display: none !important;
+    }
+
+    .login .form-row {
+        padding: 15px 0 !important;
+        border: none !important;
+    }
+
+    .login .form-row label {
+        display: block;
+        padding-bottom: 8px;
+        font-family: 'Poster', 'Bebas Neue', sans-serif;
+        color: #ffd700 !important;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+    }
+
+    .login .form-row input {
+        width: 100% !important;
+        background: #000 !important;
+        border: 1px solid #444 !important;
+        color: #fff !important;
+        padding: 12px !important;
+        border-radius: 6px !important;
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
+
+    .login .form-row input:focus {
+        border-color: #ffd700 !important;
+        outline: none;
+    }
+
+    .submit-row {
+        background: transparent !important;
+        padding: 20px 0 0 0 !important;
+        border: none !important;
+        text-align: center !important;
+    }
+
+    .submit-row input {
+        width: 100%;
+        padding: 15px !important;
+        background: #ffd700 !important;
+        color: #000 !important;
+        font-family: 'Poster', 'Bebas Neue', sans-serif !important;
+        font-size: 1.4rem !important;
+        border: none !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .submit-row input:hover {
+        background: #fff !important;
+        transform: translateY(-2px);
+    }
+
+    .errornote {
+        background: #c0392b !important;
+        border: none !important;
+        border-radius: 6px;
+        color: #fff !important;
+        margin-bottom: 20px !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="text-center mb-8">
+        <h1
+            style="color: #ffd700; font-family: 'Poster', 'Bebas Neue', sans-serif; font-size: 2.5rem; margin-bottom: 10px;">
+            ADMIN LOGIN</h1>
+        <p style="color: #888; font-size: 0.9rem;">Please enter your credentials manually.</p>
+    </div>
+
+    {% if form.errors and not form.non_field_errors %}
+    <p class="errornote">
+        {% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate
+        "Please correct the errors below." %}{% endif %}
+    </p>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+    <p class="errornote">
+        {{ error }}
+    </p>
+    {% endfor %}
+    {% endif %}
+
+    <form action="{{ app_path }}" method="post" id="login-form" autocomplete="off">
+        {% csrf_token %}
+        <div class="form-row">
+            {{ form.username.errors }}
+            {{ form.username.label_tag }} {{ form.username }}
+        </div>
+        <div class="form-row">
+            {{ form.password.errors }}
+            {{ form.password.label_tag }} {{ form.password }}
+            <input type="hidden" name="next" value="{{ next }}">
+        </div>
+        {% url 'admin_password_reset' as password_reset_url %}
+        {% if password_reset_url %}
+        <div class="password-reset-link" style="text-align: right; margin-top: 10px;">
+            <a href="{{ password_reset_url }}" style="color: #666; font-size: 0.8rem;">{% translate 'Forgotten your
+                password or username?' %}</a>
+        </div>
+        {% endif %}
+        <div class="submit-row">
+            <input type="submit" value="{% translate 'LOG IN' %}">
+        </div>
+    </form>
+</div>
+
+<script>
+    // Robustly disable any browser auto-fill leftovers
+    document.addEventListener('DOMContentLoaded', function () {
+        const usernameField = document.querySelector('input[name="username"]');
+        const passwordField = document.querySelector('input[name="password"]');
+
+        if (usernameField) {
+            usernameField.value = '';
+            usernameField.setAttribute('autocomplete', 'new-password'); // Trick browsers
+        }
+        if (passwordField) {
+            passwordField.value = '';
+            passwordField.setAttribute('autocomplete', 'new-password');
+        }
+    });
+</script>
+{% endblock %}

@@ -168,9 +168,10 @@ def place_order(request):
                 )
                 
                 
-                # Encode for Google Charts QR URL
+                # Encode for QR URL
                 encoded_upi = quote(upi_uri)
-                qr_url = f"https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl={encoded_upi}&choe=UTF-8"
+                # Using a more reliable QR API with HTTPS
+                qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={encoded_upi}"
                 
                 response_data['qr_url'] = qr_url
                 response_data['upi_uri'] = upi_uri
@@ -191,8 +192,10 @@ def confirm_payment(request):
             order = Order.objects.get(order_id=order_id)
             
             order.payment_method = 'UPI'
-            order.payment_status = 'PAID'
-            order.status = 'CONFIRMED'  # NOW it is showable on dashboard
+            order.payment_status = 'PAID_UNVERIFIED'
+            # Do NOT automatically set status to CONFIRMED. 
+            # This requires Admin manual verification now to prevent "cheating".
+            order.status = 'PENDING' 
             order.save()
             
             return JsonResponse({'status': 'success'})
