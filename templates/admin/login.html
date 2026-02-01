@@ -98,13 +98,20 @@
 </style>
 {% endblock %}
 
+{% block branding %}
+<h1 id="site-name" style="text-align: center; width: 100%; margin: 20px 0;"><a href="{% url 'admin:index' %}">SMOKY
+        BITES POS</a></h1>
+{% endblock %}
+
+{% block usertools %}{% endblock %}
+
 {% block content %}
-<div id="content-main">
-    <div class="text-center mb-8">
+<div id="content-main" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+    <div class="text-center" style="margin-bottom: 30px; text-align: center;">
         <h1
-            style="color: #ffd700; font-family: 'Poster', 'Bebas Neue', sans-serif; font-size: 2.5rem; margin-bottom: 10px;">
+            style="color: #ffd700; font-family: 'Poster', 'Bebas Neue', sans-serif; font-size: 2.2rem; margin-bottom: 10px; text-transform: uppercase;">
             ADMIN LOGIN</h1>
-        <p style="color: #888; font-size: 0.9rem;">Please enter your credentials manually.</p>
+        <p style="color: #888; font-size: 0.95rem;">Please enter your credentials manually.</p>
     </div>
 
     {% if form.errors and not form.non_field_errors %}
@@ -122,7 +129,7 @@
     {% endfor %}
     {% endif %}
 
-    <form action="{{ app_path }}" method="post" id="login-form" autocomplete="off">
+    <form action="{{ app_path }}" method="post" id="login-form" autocomplete="off" style="width: 100%;">
         {% csrf_token %}
         <div class="form-row">
             {{ form.username.errors }}
@@ -135,12 +142,12 @@
         </div>
         {% url 'admin_password_reset' as password_reset_url %}
         {% if password_reset_url %}
-        <div class="password-reset-link" style="text-align: right; margin-top: 10px;">
-            <a href="{{ password_reset_url }}" style="color: #666; font-size: 0.8rem;">{% translate 'Forgotten your
-                password or username?' %}</a>
+        <div class="password-reset-link" style="text-align: center; margin-top: 15px;">
+            <a href="{{ password_reset_url }}" style="color: #666; font-size: 0.85rem; text-decoration: none;">{%
+                translate 'Forgotten your password or username?' %}</a>
         </div>
         {% endif %}
-        <div class="submit-row">
+        <div class="submit-row" style="margin-top: 30px;">
             <input type="submit" value="{% translate 'LOG IN' %}">
         </div>
     </form>

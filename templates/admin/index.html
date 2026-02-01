@@ -87,22 +87,29 @@
 
     <hr style="border: 1px solid #333; margin-bottom: 30px;">
 
-    <!-- Redundant list hidden as it is available in the sidebar -->
-    {% if False and app_list %}
-    {% for app in app_list %}
-    <div class="app-{{ app.app_label }} module" style="margin-bottom: 20px;">
-        <table style="width: 100%;">
-            <caption><a href="{{ app.app_url }}" class="section">{{ app.name }}</a></caption>
+    <!-- QUICK ACTION GRID -->
+    {% if app_list %}
+    <div class="quick-actions-section">
+        <h2 class="section-title">QUICK MANAGEMENT</h2>
+        <div class="action-grid">
+            {% for app in app_list %}
             {% for model in app.models %}
-            <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                <td><a href="{{ model.add_url }}" class="addlink">{% translate 'Add' %}</a></td>
-                <td><a href="{{ model.admin_url }}" class="changelink">{% translate 'Change' %}</a></td>
-            </tr>
+            <a href="{{ model.admin_url }}" class="action-card">
+                <div class="action-icon">
+                    {% if 'category' in model.object_name|lower %}📁
+                    {% elif 'item' in model.object_name|lower %}🍽️
+                    {% elif 'order' in model.object_name|lower %}🛒
+                    {% elif 'user' in model.object_name|lower %}👤
+                    {% elif 'group' in model.object_name|lower %}👥
+                    {% else %}📄{% endif %}
+                </div>
+                <div class="action-label">{{ model.name }}</div>
+                <div class="action-sub">Manage & Update</div>
+            </a>
             {% endfor %}
-        </table>
+            {% endfor %}
+        </div>
     </div>
-    {% endfor %}
     {% endif %}
 </div>
 
