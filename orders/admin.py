@@ -114,7 +114,8 @@ class OrderAdmin(admin.ModelAdmin):
                 return queryset.filter(status=self.value())
             return queryset
 
-    list_filter = (RestrictStatusFilter, 'payment_status', 'payment_method', 'created_at')
+    # list_filter = (RestrictStatusFilter, 'payment_status', 'payment_method', 'created_at')
+
     search_fields = ('order_id', 'customer_name', 'customer_number')
     ordering = ('-created_at',)
     actions = None  # Smooth: Hide bulk actions
