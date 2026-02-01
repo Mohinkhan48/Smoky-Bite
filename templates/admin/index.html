@@ -2,13 +2,71 @@
 {% load i18n static %}
 
 {% block content %}
+<style>
+    .order-cta-container {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .big-order-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important;
+        color: #fff !important;
+        font-family: 'Poster', 'Bebas Neue', sans-serif !important;
+        font-size: 1.1rem !important;
+        padding: 12px 25px !important;
+        border-radius: 50px !important;
+        text-decoration: none !important;
+        box-shadow: 0 6px 15px rgba(46, 204, 113, 0.2) !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        border: 2px solid #fff !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto !important;
+        box-sizing: border-box;
+    }
+
+    .big-order-btn:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4) !important;
+        filter: brightness(1.1);
+    }
+
+    .big-order-btn span {
+        margin-right: 10px;
+        font-size: 1.4rem;
+    }
+
+    @media (max-width: 768px) {
+        .big-order-btn {
+            font-size: 0.9rem !important;
+            padding: 10px 20px !important;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .big-order-btn span {
+            font-size: 1.2rem;
+        }
+    }
+</style>
 <div id="content-main">
+    <!-- PROMINENT ORDER CTA -->
+    <div class="order-cta-container">
+        <a href="/admin/orders/order/" class="big-order-btn">
+            <span>🛒</span> MANAGE ALL ORDERS
+        </a>
+    </div>
+
     <div class="stats-header">
         <h2>FINANCIAL PERFORMANCE: {{ daily_stats.selected_date|date:"d M Y" }}</h2>
-        <form method="get" style="display: flex; gap: 10px; align-items: center;">
-            <input type="date" name="date" value="{{ daily_stats.selected_date|date:'Y-m-d' }}" 
-                   style="background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 5px 10px; border-radius: 4px;">
-            <button type="submit" class="button" style="padding: 8px 25px; border-radius: 50px; font-size: 11px;">REFRESH</button>
+        <form method="get" class="stats-filter-form">
+            <input type="date" name="date" value="{{ daily_stats.selected_date|date:'Y-m-d' }}" class="date-input">
+            <button type="submit" class="button refresh-button">REFRESH</button>
         </form>
     </div>
 
@@ -29,7 +87,8 @@
 
     <hr style="border: 1px solid #333; margin-bottom: 30px;">
 
-    {% if app_list %}
+    <!-- Redundant list hidden as it is available in the sidebar -->
+    {% if False and app_list %}
     {% for app in app_list %}
     <div class="app-{{ app.app_label }} module" style="margin-bottom: 20px;">
         <table style="width: 100%;">
@@ -46,4 +105,5 @@
     {% endfor %}
     {% endif %}
 </div>
+
 {% endblock %}
