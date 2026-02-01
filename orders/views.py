@@ -91,6 +91,7 @@ def cart_view(request):
     return render(request, 'cart.html')
 
 
+@csrf_exempt
 def place_order(request):
     if request.method == 'POST':
         try:

@@ -185,20 +185,22 @@
         if (!soundEnabled || document.hidden) return;
 
         try {
-            // 1. Fetch Latest Order ID (for sound/auto-refresh part)
+            // 1. Fetch Latest Order ID & Time
             const response = await fetch('/api/latest_order/');
             if (response.ok) {
                 const data = await response.json();
                 if (data.latest_id) {
-                    const savedLastId = localStorage.getItem('last_notified_order');
-                    if (savedLastId) lastOrderId = savedLastId;
+                    const lastId = localStorage.getItem('last_notified_order');
+                    const lastTime = parseFloat(localStorage.getItem('last_notified_time') || '0');
 
-                    if (!lastOrderId) {
-                        lastOrderId = data.latest_id;
-                        localStorage.setItem('last_notified_order', lastOrderId);
-                    } else if (String(data.latest_id) !== String(lastOrderId)) {
-                        lastOrderId = data.latest_id;
-                        localStorage.setItem('last_notified_order', lastOrderId);
+                    if (!lastId || !lastTime) {
+                        // First time or cleared storage: Set initial baseline without playing
+                        localStorage.setItem('last_notified_order', data.latest_id);
+                        localStorage.setItem('last_notified_time', data.created_at);
+                    } else if (data.created_at > lastTime) {
+                        // We have a TRULY newer order
+                        localStorage.setItem('last_notified_order', data.latest_id);
+                        localStorage.setItem('last_notified_time', data.created_at);
                         playNotification();
 
                         // Only auto-refresh if on the ORDERS LIST page
@@ -206,6 +208,11 @@
                         if (path.includes('/admin/orders/order/') && !path.includes('/add/') && !path.match(/\/\d+\//)) {
                             setTimeout(() => window.location.reload(), 1500);
                         }
+                    } else if (String(data.latest_id) !== String(lastId)) {
+                        // Order changed but it's NOT newer (e.g. older order became "latest" because newest was deleted/delivered)
+                        // Just update the ID baseline so we don't think it's new later
+                        localStorage.setItem('last_notified_order', data.latest_id);
+                        localStorage.setItem('last_notified_time', data.created_at);
                     }
                 }
             }

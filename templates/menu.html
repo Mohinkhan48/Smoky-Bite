@@ -440,6 +440,7 @@
 <!-- 1. Cart Modal Overlay -->
 <div id="cart-modal"
     class="fixed inset-0 z-[60] transform translate-y-full transition-transform duration-300 invisible">
+    {% csrf_token %}
     <div class="absolute inset-0 bg-black bg-opacity-80 backdrop-blur-sm" onclick="toggleCart()"></div>
     <div
         class="absolute bottom-0 left-0 right-0 max-w-[420px] md:max-w-[520px] lg:max-w-[600px] mx-auto bg-[#0f0f0f] border-t-2 border-yellow-500 rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl">
@@ -467,12 +468,12 @@
             <div class="mb-6" id="name-input-container">
                 <label for="customer-name" class="block text-yellow-400 font-poster text-lg mb-2 uppercase">Your
                     Name</label>
-                <input type="text" id="customer-name" placeholder="John Doe"
+                <input type="text" id="customer-name" placeholder="John Doe" maxlength="100"
                     class="w-full bg-gray-800 text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-yellow-500 font-bold mb-4">
 
                 <label for="customer-number" class="block text-yellow-400 font-poster text-lg mb-2 uppercase">Phone
                     Number</label>
-                <input type="tel" id="customer-number" placeholder="9876543210"
+                <input type="tel" id="customer-number" placeholder="9876543210" maxlength="15"
                     class="w-full bg-gray-800 text-white border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-yellow-500 font-bold">
             </div>
 
@@ -819,13 +820,21 @@
                 localStorage.removeItem('smokybites_cart');
                 window.location.href = `/order_success/${data.order_id}/`;
             } else {
-                const errorData = await response.json();
-                alert("Error: " + (errorData.error || "Unknown error occurred"));
-                throw new Error(errorData.error || "Server error");
+                let errorMsg = "Server error";
+                try {
+                    const errorData = await response.json();
+                    errorMsg = errorData.error || "Unknown error occurred";
+                } catch (e) {
+                    errorMsg = `Status: ${response.status}`;
+                }
+                alert("Error: " + errorMsg);
+                throw new Error(errorMsg);
             }
         } catch (err) {
             console.error("Order Submission Error:", err);
-            throw err; // Re-throw to be caught by processCashPayment
+            // If it's already an error we reported, don't alert again in the caller if we can help it
+            // but for simplicity, we re-throw and let processCashPayment handle the generic alert
+            throw err;
         }
     }
 

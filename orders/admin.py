@@ -97,7 +97,7 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order, site=admin_site)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('order_number', 'customer_name_bold', 'phone_link', 'time', 'pay_method', 'pay_status', 'order_status', 'amount_display')
+    list_display = ('order_number', 'customer_name_bold', 'phone_link', 'time', 'pay_method', 'pay_status', 'order_status', 'amount_display', 'delete_order')
     list_per_page = 20
     
     class RestrictStatusFilter(admin.SimpleListFilter):
@@ -118,7 +118,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     search_fields = ('order_id', 'customer_name', 'customer_number')
     ordering = ('-created_at',)
-    actions = None  # Smooth: Hide bulk actions
+    actions = ['delete_selected'] # Explicitly enabled for bulk deletion
     
     def get_urls(self):
         urls = super().get_urls()
@@ -235,6 +235,26 @@ class OrderAdmin(admin.ModelAdmin):
         return status_html
     order_status.short_description = 'Status'
     order_status.admin_order_field = 'status'
+
+    def delete_order(self, obj):
+        from django.utils.html import format_html
+        from django.urls import reverse
+        url = reverse(f'admin:orders_order_delete', args=[obj.pk])
+        return format_html(
+            '<a class="button" href="{}" style="'
+            'background: #ff4757 !important; '
+            'padding: 5px 12px; '
+            'font-size: 10px; '
+            'border-radius: 50px; '
+            'font-weight: 900; '
+            'color: #fff !important; '
+            'letter-spacing: 1px; '
+            'box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3); '
+            'transition: all 0.3s; '
+            'display: inline-block;'
+            'text-decoration: none;'
+            '">DELETE</a>', url)
+    delete_order.short_description = "Action"
 
     def time(self, obj):
         return obj.created_at.strftime("%H:%M")
