@@ -318,38 +318,49 @@
     /* Mobile Responsive Optimizations */
     @media (max-width: 768px) {
         #header {
-            display: block !important;
-            padding: 10px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 15px 10px !important;
             text-align: center;
             height: auto !important;
+            gap: 10px;
         }
 
         #branding {
             margin: 0 !important;
-            display: inline-block;
         }
 
         #branding h1 {
-            font-size: 1.2rem !important;
-            margin: 5px 0 !important;
+            font-size: 1.5rem !important;
+            margin: 0 !important;
         }
 
         #user-tools {
             position: static !important;
             display: flex;
+            flex-direction: row !important;
+            /* Force horizontal */
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            padding: 10px 0;
+            gap: 5px;
+            padding: 8px 0 !important;
             margin: 0 !important;
-            border-top: 1px solid #333;
-            font-size: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.75rem !important;
+            color: #ccc !important;
+            text-transform: uppercase;
         }
 
         #user-tools a,
         #user-tools form {
             margin: 0 !important;
+            white-space: nowrap;
+        }
+
+        #user-tools strong {
+            margin-right: 5px;
+            color: var(--primary) !important;
         }
 
         #notif-toggle {
@@ -371,25 +382,26 @@
         /* Sidebar behavior - hide or stack better */
         #content-related {
             display: none;
-            /* Hide standard filters on mobile by default to show the list */
             width: 100% !important;
             float: none !important;
             margin-top: 20px;
         }
 
-        /* If we want a toggle for filters, we'd need more JS, but for now let's just make the list dominant */
         #changelist {
             width: 100% !important;
         }
 
-        #changelist table {
-            display: block;
-            overflow-x: auto;
-            white-space: nowrap;
+        /* Essential fix for "sliding" the table */
+        #changelist .results {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
         }
 
-        .dashboard .module table {
-            width: 100%;
+        #changelist table {
+            width: 100% !important;
+            min-width: 600px;
+            /* Force minimum width to enable scrolling */
         }
 
         /* Breadcrumbs usually waste space on mobile */

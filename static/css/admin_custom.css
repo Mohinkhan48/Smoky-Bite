@@ -108,6 +108,8 @@ fieldset.module h2 {
     background-color: var(--bg-dark) !important;
 }
 
+
+
 .module {
     margin-bottom: 30px !important;
 }
@@ -356,13 +358,16 @@ fieldset.module h2 {
     }
 
     #user-tools {
-
         position: static !important;
         display: flex !important;
-        flex-direction: column !important;
+        flex-direction: row !important;
+        /* Force horizontal */
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        align-items: center !important;
         gap: 8px !important;
         background: rgba(255, 255, 255, 0.03);
-        padding: 12px !important;
+        padding: 12px 10px !important;
         border-radius: 8px;
         font-size: 0.75rem !important;
     }
@@ -402,10 +407,16 @@ fieldset.module h2 {
         margin: 0 !important;
     }
 
-    /* TABLE FIXES */
+    /* TABLE COMPACTION & SLIDING */
+    #changelist .results {
+        overflow-x: auto !important;
+        display: block !important;
+        width: 100% !important;
+    }
+
     #changelist table {
-        border-radius: 8px;
-        overflow: hidden;
+        min-width: 700px !important;
+        /* Ensure enough width for labels */
     }
 
     #changelist table thead th {
@@ -419,86 +430,19 @@ fieldset.module h2 {
         font-size: 12px !important;
     }
 
-    /* Fix for STATUS and TOTAL headings specifically */
-    .column-order_status,
-    .column-amount_display {
-        text-align: center !important;
+    /* SIDEBAR MOBILE FIT */
+    #nav-sidebar {
+        width: 100% !important;
+        position: relative !important;
+        display: block !important;
+        border-right: none !important;
+        border-bottom: 2px solid #333 !important;
     }
 
-    .status-badge {
-        padding: 4px 10px !important;
-        min-width: 70px;
-        text-align: center;
-    }
-
-    .stats-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-
-    .stats-header h2 {
-        font-size: 1.2rem !important;
-        margin-bottom: 0;
-    }
-
-    .stats-filter-form {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .stats-card {
-        padding: 15px;
-    }
-
-    .stat-value {
-        font-size: 1.8rem;
-    }
-
-    /* TOUCH FRIENDLY TARGETS */
-    .button,
-    input[type=submit],
-    .refresh-button,
-    .opt-btn {
-        min-height: 44px;
-        /* Apple/Google recommended minimum */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #changelist table tbody td {
-        padding: 12px 10px !important;
-        /* Bigger tap area for rows */
-    }
-
-    .status-badge {
-        padding: 6px 14px;
-        font-size: 10px;
-    }
-
-    /* TABLE COMPACTION */
-    #changelist table thead th {
-        font-size: 0.8rem !important;
-        padding: 10px 5px !important;
-    }
-
-    /* Hide less critical columns on very small screens to reduce scroll */
-    @media (max-width: 480px) {
-        .field-order_number {
-            font-size: 10px;
-        }
-
-        .column-pay_method,
-        .column-time {
-            display: none;
-        }
+    #content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 }
 
