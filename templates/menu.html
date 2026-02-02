@@ -518,9 +518,19 @@
 
             <p class="text-xs text-gray-400 mb-6 font-bold">Scan & Pay using any UPI app</p>
 
+            <!-- Mobile Direct Pay Button (Hidden by default, shown via JS) -->
+            <a id="upi-mobile-link" href="#"
+                class="hidden w-full bg-blue-600 text-white font-poster text-xl py-4 rounded-xl shadow-lg hover:bg-blue-700 transition mb-3 flex items-center justify-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                OPEN UPI APP
+            </a>
+
             <button onclick="confirmUpiPayment(event)"
                 class="w-full bg-green-500 text-white font-poster text-xl py-3 rounded-xl shadow-lg hover:bg-green-600 transition">
-                FINISH TRANSACTION
+                I HAVE PAID
             </button>
         </div>
     </div>
@@ -694,17 +704,24 @@
                 document.getElementById('upi-order-id').innerText = '#' + data.order_id;
                 document.getElementById('upi-qr-image').src = data.qr_url;
 
-                // Direct Pay on Mobile
+                // Direct Pay Link for Mobile
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                const mobileLink = document.getElementById('upi-mobile-link');
+
                 if (isMobile && data.upi_uri) {
+                    mobileLink.href = data.upi_uri;
+                    mobileLink.classList.remove('hidden');
+                    // Automatically try to open it once
                     window.location.href = data.upi_uri;
+                } else {
+                    mobileLink.classList.add('hidden');
                 }
 
                 // CLEAR CART IMMEDIATELY - The order is safely in the database now.
                 // This prevents redundant orders if the user goes back or refreshes.
                 cart = [];
                 localStorage.removeItem('smokybites_cart');
-                updateCartBadge(); // Update the UI floating quantity
+                updateCartDisplay(); // Update the UI floating quantity
 
                 // Show the QR/Confirmation Modal directly
                 hideModal('cart-modal');
@@ -715,7 +732,7 @@
             }
         } catch (e) {
             console.error(e);
-            alert("Network error");
+            alert("Failed to initiate payment");
         } finally {
             btn.innerHTML = originalText;
             btn.disabled = false;
@@ -725,9 +742,11 @@
     async function confirmUpiPayment(event) {
         if (!currentOrderId) return;
 
-        const btn = event.target;
-        btn.innerText = "Verifying...";
-        btn.disabled = true;
+        const btn = event ? event.target : null;
+        if (btn) {
+            btn.innerText = "Verifying...";
+            btn.disabled = true;
+        }
 
         const response = await fetch('/confirm_payment/', {
             method: 'POST',
@@ -755,6 +774,22 @@
         hideModal('upi-modal');
         showModal('cart-modal');
     }
+
+    // --- AUTO-COMPLETE ON RETURN ---
+    // This watches if the user leaves the tab (to pay) and comes back.
+    // If they come back, we automatically trigger the "Success" flow.
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && currentOrderId) {
+            console.log("User returned to tab. Checking order status...");
+            // Small delay to ensure they are actually looking at the page
+            setTimeout(() => {
+                if (document.getElementById('upi-modal').classList.contains('invisible') === false) {
+                    // Only auto-confirm if they are still on the UPI modal
+                    confirmUpiPayment();
+                }
+            }, 1500);
+        }
+    });
 
     // --- Cash Submission Logic ---
     async function processCashPayment(btnElement, event) {
@@ -832,8 +867,6 @@
             }
         } catch (err) {
             console.error("Order Submission Error:", err);
-            // If it's already an error we reported, don't alert again in the caller if we can help it
-            // but for simplicity, we re-throw and let processCashPayment handle the generic alert
             throw err;
         }
     }
