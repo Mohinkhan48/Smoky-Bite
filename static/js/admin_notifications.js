@@ -203,10 +203,16 @@
                         localStorage.setItem('last_notified_time', data.created_at);
                         playNotification();
 
-                        // Only auto-refresh if on the ORDERS LIST page
+                        // 3. Auto-refresh if on the stats dashboard or orders list
                         const path = window.location.pathname;
-                        if (path.includes('/admin/orders/order/') && !path.includes('/add/') && !path.match(/\/\d+\//)) {
-                            setTimeout(() => window.location.reload(), 1500);
+                        const isOrdersList = path.includes('/admin/orders/order');
+                        const isDashboard = path === '/admin/' || path === '/admin/index.html';
+                        const isEditing = path.includes('/add/') || path.match(/\/\d+\//);
+
+                        if ((isOrdersList || isDashboard) && !isEditing) {
+                            console.log("New order detected, refreshing page...");
+                            // Brief delay so sound can start, then reload
+                            setTimeout(() => window.location.reload(), 1000);
                         }
                     } else if (String(data.latest_id) !== String(lastId)) {
                         // Order changed but it's NOT newer (e.g. older order became "latest" because newest was deleted/delivered)
