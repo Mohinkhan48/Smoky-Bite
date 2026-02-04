@@ -36,7 +36,7 @@ def fix_image_paths(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('orders', '0014_remove_order_delivery_status_alter_order_status'),
+        ('orders', '0015_correct_image_casing'),
     ]
 
     operations = [
