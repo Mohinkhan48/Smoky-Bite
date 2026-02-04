@@ -223,9 +223,11 @@
                             <div
                                 class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
                             </div>
-                            <img src="{% static item.image %}" class="relative w-24 h-auto" alt="{{ item.name }}"
-                                loading="eager" fetchpriority="high"
+                            {% with category.items.all|first as first_item %}
+                            <img src="{% static first_item.image %}" class="relative w-24 h-auto"
+                                alt="{{ category.name }}" loading="eager" fetchpriority="high"
                                 style="opacity: 1 !important; visibility: visible !important;">
+                            {% endwith %}
                         </div>
                     </div>
 
