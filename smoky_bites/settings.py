@@ -84,26 +84,26 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# ======================
-# STATIC FILES (CRITICAL)
-# ======================
+# STATIC FILES (WhiteNoise)
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 WHITENOISE_MANIFEST_STRICT = False
 
-# ❌ MEDIA REMOVED (Railway free)
+# MEDIA (optional – Railway free is not persistent)
+# MEDIA (Removed for Railway persistence - using STATIC)
+# MEDIA_URL = "/media/"
+# MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ======================
-# ADMIN AUTH
-# ======================
+# UPI CONFIG
+UPI_CONFIG = {
+    "ID": "paytm.s17ewnw@pty",
+    "MERCHANT_NAME": "SHAUL KHAN",
+    "MC": "5812",
+    "CURRENCY": "INR",
+}
 HARDCODED_USERNAME = os.environ.get("ADMIN_USER", "admin")
 HARDCODED_PASSWORD = os.environ.get("ADMIN_PASS", "change-this")
 

@@ -218,138 +218,135 @@
             <div class="grid grid-cols-1 gap-y-0 relative z-20 px-4">
                 {% for category in standard_categories %}
                 <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
-    <div class="relative inline-block">
-        <div class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110"></div>
+                    <div class="relative inline-block">
+                        <div class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
+                        </div>
 
-        {% with category.name|lower as cname %}
-        <img
-            src="{% static 'img/' %}{{ cname }}.png"
-            alt="{{ category.name }}"
-            class="food-asset relative w-36 h-auto mx-auto"
-            loading="eager"
-            fetchpriority="high"
-            onerror="this.onerror=null;this.src='{% static 'img/placeholder.png' %}';">
-        {% endwith %}
+                        {% with category.items.all|first as first_item %}
+                        <img src="{% static first_item.image %}" alt="{{ category.name }}"
+                            class="relative w-24 h-auto mx-auto" loading="eager" fetchpriority="high"
+                            style="opacity: 1 !important; visibility: visible !important;">
+                        {% endwith %}
 
+                    </div>
+                </div>
+
+                <div class="mb-0 text-center">
+                    <h2
+                        class="font-marker text-2xl text-black bg-yellow-400 inline-block px-4 py-1 skew-x-[-10deg] shadow-lg relative z-10">
+                        {{ category.name }}</h2>
+                </div>
+
+                <div class="space-y-3 px-2">
+                    {% for item in category.items.all %}
+                    <div class="flex justify-between items-end group">
+                        <div class="menu-item-row flex-1 flex justify-between items-end mr-2">
+                            <h3 class="item-name font-poster text-xl text-yellow-400 tracking-wide">{{ item.name }}
+                            </h3>
+                            <div class="item-price font-bold text-lg text-white">₹{{ item.price }}</div>
+                        </div>
+                        <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
+                            data-price="{{ item.price }}" data-image="{% static item.image %}"
+                            class="bg-yellow-500 text-black font-bold text-xs px-2 py-1 rounded hover:bg-white transition uppercase mb-1 btn-smooth">
+                            ADD
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Spacer for bottom bar -->
+        <div class="h-16"></div>
+    </div>
+
+    <!-- BACK SIDE: PAGE 2 MENU -->
+    <div class="card-face card-back bg-[#111] overflow-y-auto">
+        <!-- Header -->
+        <div class="text-center mb-6 mt-8 relative z-20">
+            <h2
+                class="font-poster text-5xl text-white tracking-widest leading-none drop-shadow-lg border-b-4 border-yellow-500 inline-block">
+                SPECIALS</h2>
+        </div>
+
+        <!-- Flip Button (Back) -->
+        <div class="text-center mb-8 mt-8 relative z-30">
+            <button onclick="flipCard()"
+                class="bg-gray-800 text-white font-poster text-xl px-6 py-2 rounded-full shadow-lg hover:bg-gray-700 transition transform flex items-center justify-center mx-auto border-2 border-yellow-500 btn-smooth">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg> PREVIOUS PAGE
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-y-4 relative z-20 px-4">
+            {% for category in special_categories %}
+            <div class="mb-1">
+                <div class="mb-1 text-center">
+                    <h2
+                        class="font-marker text-2xl text-black bg-yellow-400 inline-block px-4 py-1 skew-x-[-10deg] shadow-lg">
+                        {{ category.name }}</h2>
+                </div>
+
+                <div class="space-y-1 px-2">
+                    {% for item in category.items.all %}
+                    {% if category.name != 'COMBOS' %}
+                    <!-- Standard Item Styling -->
+                    <div class="flex justify-between items-end group">
+                        <div class="menu-item-row flex-1 flex justify-between items-end mr-2">
+                            <h3 class="item-name font-poster text-xl text-yellow-400 tracking-wide">{{ item.name }}
+                            </h3>
+                            <div class="item-price font-bold text-lg text-white">₹{{ item.price }}</div>
+                        </div>
+                        <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
+                            data-price="{{ item.price }}" data-image="{% static item.image %}"
+                            class="bg-yellow-500 text-black font-bold text-xs px-2 py-1 rounded hover:bg-white transition uppercase mb-1 btn-smooth">
+                            ADD
+                        </button>
+                    </div>
+                    {% else %}
+                    <!-- Combo Item Styling -->
+                    <div class="mb-[-16px] translate-y-5 relative z-20 flex justify-start ml-2">
+                        <div class="relative inline-block">
+                            <div
+                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
+                            </div>
+                            <img src="{% static item.image %}" class="relative w-32 h-auto" alt="{{ item.name }}"
+                                loading="eager" fetchpriority="high"
+                                style="opacity: 1 !important; visibility: visible !important;">
+                        </div>
+                    </div>
+                    <div class="mb-0 -mt-16 border border-gray-800 p-2 rounded relative bg-gray-900 group">
+
+
+                        <div class="flex justify-between items-center border-b border-gray-700 pb-1 mb-1">
+                            <h3 class="font-poster text-xl text-yellow-400 tracking-wide">{{ item.name }}</h3>
+                            <div class="font-bold text-lg text-white">₹{{ item.price }}</div>
+                        </div>
+                        <div class="font-marker text-xs text-gray-300 leading-snug">
+                            {% if 'MEDIUM' in item.name %}
+                            2 LEG PIECE • 2 WINGS • 2 LOLLIPOP • 6 PIECE TIKKA • 1 MOJITO
+                            {% elif 'LARGE' in item.name %}
+                            2 LEG PIECE • 4 WINGS • 4 LOLLIPOP • 8 PIECE MALAI TIKKA • 2 TYPES OF MOJITO
+                            {% endif %}
+                        </div>
+                        <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
+                            data-price="{{ item.price }}" data-image="{% static item.image %}"
+                            class="absolute -top-2 -right-2 bg-yellow-500 text-black font-bold h-6 w-6 rounded-full flex items-center justify-center hover:bg-white transition shadow-lg z-50 btn-smooth">
+                            +
+                        </button>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Spacer for bottom bar -->
+        <div class="h-16"></div>
     </div>
 </div>
-
-                    <div class="mb-0 text-center">
-                        <h2
-                            class="font-marker text-2xl text-black bg-yellow-400 inline-block px-4 py-1 skew-x-[-10deg] shadow-lg relative z-10">
-                            {{ category.name }}</h2>
-                    </div>
-
-                    <div class="space-y-3 px-2">
-                        {% for item in category.items.all %}
-                        <div class="flex justify-between items-end group">
-                            <div class="menu-item-row flex-1 flex justify-between items-end mr-2">
-                                <h3 class="item-name font-poster text-xl text-yellow-400 tracking-wide">{{ item.name }}
-                                </h3>
-                                <div class="item-price font-bold text-lg text-white">₹{{ item.price }}</div>
-                            </div>
-                            <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
-                                data-price="{{ item.price }}" data-image="{% static item.image %}"
-                                class="bg-yellow-500 text-black font-bold text-xs px-2 py-1 rounded hover:bg-white transition uppercase mb-1 btn-smooth">
-                                ADD
-                            </button>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            <!-- Spacer for bottom bar -->
-            <div class="h-16"></div>
-        </div>
-
-        <!-- BACK SIDE: PAGE 2 MENU -->
-        <div class="card-face card-back bg-[#111] overflow-y-auto">
-            <!-- Header -->
-            <div class="text-center mb-6 mt-8 relative z-20">
-                <h2
-                    class="font-poster text-5xl text-white tracking-widest leading-none drop-shadow-lg border-b-4 border-yellow-500 inline-block">
-                    SPECIALS</h2>
-            </div>
-
-            <!-- Flip Button (Back) -->
-            <div class="text-center mb-8 mt-8 relative z-30">
-                <button onclick="flipCard()"
-                    class="bg-gray-800 text-white font-poster text-xl px-6 py-2 rounded-full shadow-lg hover:bg-gray-700 transition transform flex items-center justify-center mx-auto border-2 border-yellow-500 btn-smooth">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg> PREVIOUS PAGE
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 gap-y-4 relative z-20 px-4">
-                {% for category in special_categories %}
-                <div class="mb-1">
-                    <div class="mb-1 text-center">
-                        <h2
-                            class="font-marker text-2xl text-black bg-yellow-400 inline-block px-4 py-1 skew-x-[-10deg] shadow-lg">
-                            {{ category.name }}</h2>
-                    </div>
-
-                    <div class="space-y-1 px-2">
-                        {% for item in category.items.all %}
-                        {% if category.name != 'COMBOS' %}
-                        <!-- Standard Item Styling -->
-                        <div class="flex justify-between items-end group">
-                            <div class="menu-item-row flex-1 flex justify-between items-end mr-2">
-                                <h3 class="item-name font-poster text-xl text-yellow-400 tracking-wide">{{ item.name }}
-                                </h3>
-                                <div class="item-price font-bold text-lg text-white">₹{{ item.price }}</div>
-                            </div>
-                            <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
-                                data-price="{{ item.price }}" data-image="{% static item.image %}"
-                                class="bg-yellow-500 text-black font-bold text-xs px-2 py-1 rounded hover:bg-white transition uppercase mb-1 btn-smooth">
-                                ADD
-                            </button>
-                        </div>
-                        {% else %}
-                        <!-- Combo Item Styling -->
-                        <div class="mb-[-16px] translate-y-5 relative z-20 flex justify-start ml-2">
-                            <div class="relative inline-block">
-                                <div
-                                    class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                                </div>
-                                <img src="{% static item.image %}" class="relative w-32 h-auto" alt="{{ item.name }}"
-                                    loading="eager" fetchpriority="high"
-                                    style="opacity: 1 !important; visibility: visible !important;">
-                            </div>
-                        </div>
-                        <div class="mb-0 -mt-16 border border-gray-800 p-2 rounded relative bg-gray-900 group">
-
-
-                            <div class="flex justify-between items-center border-b border-gray-700 pb-1 mb-1">
-                                <h3 class="font-poster text-xl text-yellow-400 tracking-wide">{{ item.name }}</h3>
-                                <div class="font-bold text-lg text-white">₹{{ item.price }}</div>
-                            </div>
-                            <div class="font-marker text-xs text-gray-300 leading-snug">
-                                {% if 'MEDIUM' in item.name %}
-                                2 LEG PIECE • 2 WINGS • 2 LOLLIPOP • 6 PIECE TIKKA • 1 MOJITO
-                                {% elif 'LARGE' in item.name %}
-                                2 LEG PIECE • 4 WINGS • 4 LOLLIPOP • 8 PIECE MALAI TIKKA • 2 TYPES OF MOJITO
-                                {% endif %}
-                            </div>
-                            <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
-                                data-price="{{ item.price }}" data-image="{% static item.image %}"
-                                class="absolute -top-2 -right-2 bg-yellow-500 text-black font-bold h-6 w-6 rounded-full flex items-center justify-center hover:bg-white transition shadow-lg z-50 btn-smooth">
-                                +
-                            </button>
-                        </div>
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            <!-- Spacer for bottom bar -->
-            <div class="h-16"></div>
-        </div>
-    </div>
 
 </div>
 
