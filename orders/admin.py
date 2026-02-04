@@ -27,8 +27,10 @@ class SmokyBitesAdminSite(admin.AdminSite):
 
         orders_today = Order.objects.filter(created_at__date=target_date)
         
-        # FIX: count orders, not item quantities
-        total_orders_count = orders_today.count()
+        # FIX: count total items sold, not just orders
+        total_orders_count = OrderItem.objects.filter(
+            order__created_at__date=target_date
+        ).aggregate(qty=Sum('quantity'))['qty'] or 0
 
         total_revenue = orders_today.aggregate(total=Sum('total_amount'))['total'] or 0
         

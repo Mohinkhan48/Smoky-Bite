@@ -219,9 +219,11 @@ def dashboard_stats_api(request):
     from django.db.models import Sum, F
     
     target_date = timezone.now().date()
-    orders_today = Order.objects.filter(created_at__date=target_date, status='CONFIRMED')
-    
-    total_orders = orders_today.count() # FIX: count orders
+    # FIX: count total items sold
+    total_orders = OrderItem.objects.filter(
+        order__created_at__date=target_date, 
+        order__status='CONFIRMED'
+    ).aggregate(qty=Sum('quantity'))['qty'] or 0
 
     total_revenue = orders_today.aggregate(total=Sum('total_amount'))['total'] or 0
     
