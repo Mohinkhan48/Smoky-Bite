@@ -3,7 +3,7 @@
 
     let lastOrderId = localStorage.getItem('last_notified_order');
     let soundEnabled = localStorage.getItem('sound_notifications_enabled') === 'true';
-    const POLLING_INTERVAL = 10000; // Poll every 10 seconds
+    const POLLING_INTERVAL = 3000; // Poll every 3 seconds for near-instant notification
 
     // Create the Toggle Button
     const toggleBtn = document.createElement('div');
