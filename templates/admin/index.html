@@ -4,7 +4,7 @@
 {% block content %}
 <style>
     .order-cta-container {
-        margin-bottom: 30px;
+        margin: 20px 0 30px;
         text-align: center;
     }
 
@@ -63,10 +63,12 @@
     </div>
 
     <div class="stats-header">
-        <h2>FINANCIAL PERFORMANCE: {{ daily_stats.selected_date|date:"d M Y" }}</h2>
+        <h2
+            style="font-family: 'Poster', 'Bebas Neue', sans-serif !important; color: var(--primary-yellow); letter-spacing: 1.5px; margin-bottom: 20px;">
+            FINANCIAL PERFORMANCE: {{ daily_stats.selected_date|date:"d M Y" }}</h2>
         <form method="get" class="stats-filter-form">
             <input type="date" name="date" value="{{ daily_stats.selected_date|date:'Y-m-d' }}" class="date-input">
-            <button type="submit" class="button refresh-button">REFRESH</button>
+            <button type="submit" class="button refresh-button">REFRESH DATA</button>
         </form>
     </div>
 

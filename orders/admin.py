@@ -1,3 +1,4 @@
+import datetime
 from django.contrib import admin
 from django.utils import timezone
 from django.db.models import Sum, F
@@ -18,7 +19,7 @@ class SmokyBitesAdminSite(admin.AdminSite):
         query_date = request.GET.get('date')
         if query_date:
             try:
-                target_date = timezone.datetime.strptime(query_date, '%Y-%m-%d').date()
+                target_date = datetime.datetime.strptime(query_date, '%Y-%m-%d').date()
             except ValueError:
                 target_date = timezone.now().date()
         else:
@@ -26,20 +27,23 @@ class SmokyBitesAdminSite(admin.AdminSite):
 
         orders_today = Order.objects.filter(created_at__date=target_date)
         
-        total_items = OrderItem.objects.filter(
-            order__created_at__date=target_date
-        ).aggregate(total=Sum('quantity'))['total'] or 0
+        # FIX: count orders, not item quantities
+        total_orders_count = orders_today.count()
 
         total_revenue = orders_today.aggregate(total=Sum('total_amount'))['total'] or 0
         
-        total_profit = OrderItem.objects.filter(
-            order__created_at__date=target_date
-        ).aggregate(
-            profit=Sum((F('price') - F('cost_price')) * F('quantity'))
-        )['profit'] or 0
+        try:
+            total_profit = OrderItem.objects.filter(
+                order__created_at__date=target_date
+            ).aggregate(
+                profit=Sum((F('price') - F('cost_price')) * F('quantity'))
+            )['profit'] or 0
+        except Exception:
+            # Fallback if cost_price column is missing from DB
+            total_profit = 0
 
         return {
-            'total_orders': total_items,
+            'total_orders': total_orders_count,
             'total_revenue': f"{total_revenue:.2f}",
             'total_profit': f"{total_profit:.2f}",
             'selected_date': target_date,
@@ -55,7 +59,7 @@ class SmokyBitesAdminSite(admin.AdminSite):
         extra_context['daily_stats'] = self.get_stats_context(request)
         return super().app_index(request, app_label, extra_context)
 
-admin_site = SmokyBitesAdminSite(name='smoky_admin')
+admin_site = SmokyBitesAdminSite(name='admin')
 
 @admin.register(Category, site=admin_site)
 class CategoryAdmin(admin.ModelAdmin):
@@ -118,7 +122,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     search_fields = ('order_id', 'customer_name', 'customer_number')
     ordering = ('-created_at',)
-    actions = ['delete_selected'] # Explicitly enabled for bulk deletion
+    actions = ['delete_selected', 'generate_profit_report'] # RESTORED: generate_profit_report
     
     def get_urls(self):
         urls = super().get_urls()

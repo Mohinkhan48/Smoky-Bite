@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% load static %}
 
 {% block extrahead %}
 <link
@@ -162,12 +163,31 @@
 
     /* Layout Containers */
     #content {
-        padding: 30px 40px !important;
+        padding: 40px !important;
+        margin: 0 auto !important;
+        max-width: 1200px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
-    .dashboard #content {
-        max-width: 1400px;
-        margin: 0 auto;
+    /* Standard Django sidebar behavior - centered */
+    #nav-sidebar,
+    .toggle-nav-sidebar,
+    #nav-filter,
+    .breadcrumbs {
+        display: none !important;
+    }
+
+    #main {
+        display: block !important;
+    }
+
+    .shifted #content {
+        margin-left: 0 !important;
+    }
+
+    .main.shifted {
+        margin-left: 0 !important;
     }
 
 
@@ -417,12 +437,12 @@
         }
     }
 </style>
-<link rel="stylesheet" href="/static/css/admin_custom.css">
+<link rel="stylesheet" href="{% static 'css/admin_custom.css' %}">
 <script src="/static/js/admin_notifications.js"></script>
 {% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">SMOKY BITES POS</a></h1>
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:"SMOKY BITES ADMIN" }}</a></h1>
 {% endblock %}
 
 {% block usertools %}
