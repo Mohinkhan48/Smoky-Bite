@@ -217,19 +217,22 @@
 
             <div class="grid grid-cols-1 gap-y-0 relative z-20 px-4">
                 {% for category in standard_categories %}
-                <div class="mb-0">
-                    <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
-                        <div class="relative inline-block">
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                            </div>
-                            {% with category.items.all|first as first_item %}
-                            <img src="{% static first_item.image %}" class="relative w-24 h-auto"
-                                alt="{{ category.name }}" loading="eager" fetchpriority="high"
-                                style="opacity: 1 !important; visibility: visible !important;">
-                            {% endwith %}
-                        </div>
-                    </div>
+                <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
+    <div class="relative inline-block">
+        <div class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110"></div>
+
+        {% with category.name|lower as cname %}
+        <img
+            src="{% static 'img/' %}{{ cname }}.png"
+            alt="{{ category.name }}"
+            class="food-asset relative w-36 h-auto mx-auto"
+            loading="eager"
+            fetchpriority="high"
+            onerror="this.onerror=null;this.src='{% static 'img/placeholder.png' %}';">
+        {% endwith %}
+
+    </div>
+</div>
 
                     <div class="mb-0 text-center">
                         <h2
