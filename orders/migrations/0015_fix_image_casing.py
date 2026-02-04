@@ -16,7 +16,7 @@ def fix_image_paths(apps, schema_editor):
     }
 
     for item in MenuItem.objects.all():
-        current = item.image.lower().replace('\\', '/') # Normalize
+        current = str(item.image).lower().replace('\\', '/') # Normalize
         
         # Check standard mapping
         if current in mapping:
@@ -30,7 +30,7 @@ def fix_image_paths(apps, schema_editor):
         # even if not exact match in dict, but let's be safe with direct mapping first.
         
         # Also ensure simple "Momos.png" -> "img/Momos.png"
-        if not item.image.startswith('img/'):
+        if not str(item.image).startswith('img/'):
             # Try to save it
             pass 
 

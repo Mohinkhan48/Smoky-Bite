@@ -3,9 +3,7 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ======================
 # SECURITY
-# ======================
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-smokybites-mock-key")
 DEBUG = False
 
@@ -15,9 +13,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.railway.app",
 ]
 
-# ======================
-# APPS
-# ======================
+# APPLICATIONS
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -28,9 +24,7 @@ INSTALLED_APPS = [
     "orders",
 ]
 
-# ======================
 # MIDDLEWARE
-# ======================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -44,9 +38,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "smoky_bites.urls"
 
-# ======================
 # TEMPLATES
-# ======================
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -66,9 +58,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "smoky_bites.wsgi.application"
 
-# ======================
-# DATABASE
-# ======================
+# DATABASE (SQLite – OK for single restaurant)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -76,9 +66,15 @@ DATABASES = {
     }
 }
 
-# ======================
-# I18N
-# ======================
+# PASSWORD VALIDATION
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+# INTERNATIONALIZATION
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
@@ -87,6 +83,11 @@ USE_TZ = True
 # STATIC FILES (WhiteNoise)
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 WHITENOISE_MANIFEST_STRICT = False
 
@@ -104,6 +105,8 @@ UPI_CONFIG = {
     "MC": "5812",
     "CURRENCY": "INR",
 }
+
+# ADMIN AUTH (SAFE – ENV BASED)
 HARDCODED_USERNAME = os.environ.get("ADMIN_USER", "admin")
 HARDCODED_PASSWORD = os.environ.get("ADMIN_PASS", "change-this")
 
