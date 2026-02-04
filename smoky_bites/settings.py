@@ -5,14 +5,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-smokybites-mock-key')
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*'] # Allowed for initial staging, usually restricted to specific domains
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-CSRF_TRUSTED_ORIGINS = ['https://*.render.com', 'https://*.vercel.app']
+ALLOWED_HOSTS = ["*.railway.app"] # Allowed for initial staging, usually restricted to specific domains
 
 INSTALLED_APPS = [
     'django.contrib.admin',
