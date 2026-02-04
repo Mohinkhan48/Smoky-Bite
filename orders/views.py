@@ -36,36 +36,36 @@ def menu_view(request):
     # Only populate if no categories exist to save database IO in production
     if not Category.objects.exists():
         menu = {
-            'MOMOS MENU': [('CKN STEEM MOMOS', 60), ('CKN FRIED MOMOS', 70), ('CKN PERI PERI FRIED MOMOS', 70)],
-            'BURGER': [('CKN BURGER', 79), ('CKN CHEESE BURGER', 99), ('CKN ZINGER BURGER', 110)],
-            'BROASTED & FRIES': [('BROASTED CHICKEN (4 PCS)', 149), ('PERI PERI FRENCH FRIES', 70), ('SALTED FRENCH FRIES', 70)],
-            'HOT & CRISPY': [('CKN CHEESE BALLS (5 PCS)', 79), ('CKN CRISPY STRIPS (5 PCS)', 79), ('CKN NUGGETS (5 PCS)', 79), ('CKN CRISPY POPCORN', 79)],
-            'MOCKTAILS': [('BLUE ANGEL', 49), ('LIME MINT', 49), ('BLUEBERRY', 49), ('GINGER LIME', 49)]
+            'MOMOS MENU': [('CKN STEEM MOMOS', 60, 'img/Momos.png'), ('CKN FRIED MOMOS', 70, 'img/Momos.png'), ('CKN PERI PERI FRIED MOMOS', 70, 'img/Momos.png')],
+            'BURGER': [('CKN BURGER', 79, 'img/Burgerimage.png'), ('CKN CHEESE BURGER', 99, 'img/Burgerimage.png'), ('CKN ZINGER BURGER', 110, 'img/Burgerimage.png')],
+            'BROASTED & FRIES': [('BROASTED CHICKEN (4 PCS)', 149, 'img/Brost.png'), ('PERI PERI FRENCH FRIES', 70, 'img/Brost.png'), ('SALTED FRENCH FRIES', 70, 'img/Brost.png')],
+            'HOT & CRISPY': [('CKN CHEESE BALLS (5 PCS)', 79, 'img/Hotcrispy.png'), ('CKN CRISPY STRIPS (5 PCS)', 79, 'img/Hotcrispy.png'), ('CKN NUGGETS (5 PCS)', 79, 'img/Hotcrispy.png'), ('CKN CRISPY POPCORN', 79, 'img/Hotcrispy.png')],
+            'MOCKTAILS': [('BLUE ANGEL', 49, 'img/Mocktails.png'), ('LIME MINT', 49, 'img/Mocktails.png'), ('BLUEBERRY', 49, 'img/Mocktails.png'), ('GINGER LIME', 49, 'img/Mocktails.png')]
         }
         
         for cat_name, items in menu.items():
             cat = get_safe_category(cat_name)
-            for name, price in items:
+            for name, price, img_path in items:
                 MenuItem.objects.get_or_create(
                     category=cat, 
                     name=name, 
-                    defaults={'price': price}
+                    defaults={'price': price, 'image': img_path}
                 )
             
         specials_data = {
-            'HOT & SPICY': [('LEG PIECE ( 1 PCS )', 70), ('LOLLIPOP ( 4 PCS )', 120), ('WINGS ( 5 PCS )', 130), ('TIKKA ( 8 PCS )', 140)],
-            'PERI PERI': [('LEG PIECE ( 1 PCS )', 80), ('LOLLIPOP ( 4 PCS )', 130), ('WINGS ( 5 PCS )', 140), ('TIKKA ( 8 PCS )', 150)],
-            'MALAI SPECIAL': [('LEG PIECE ( 1 PCS )', 90), ('LOLLIPOP ( 4 PCS )', 140), ('WINGS ( 5 PCS )', 150), ('TIKKA ( 8 PCS )', 160)],
-            'COMBOS': [('MEDIUM COMBO', 399), ('LARGE COMBO', 599)]
+            'HOT & SPICY': [('LEG PIECE ( 1 PCS )', 70, 'img/Brost.png'), ('LOLLIPOP ( 4 PCS )', 120, 'img/Brost.png'), ('WINGS ( 5 PCS )', 130, 'img/Brost.png'), ('TIKKA ( 8 PCS )', 140, 'img/Brost.png')],
+            'PERI PERI': [('LEG PIECE ( 1 PCS )', 80, 'img/Brost.png'), ('LOLLIPOP ( 4 PCS )', 130, 'img/Brost.png'), ('WINGS ( 5 PCS )', 140, 'img/Brost.png'), ('TIKKA ( 8 PCS )', 150, 'img/Brost.png')],
+            'MALAI SPECIAL': [('LEG PIECE ( 1 PCS )', 90, 'img/Brost.png'), ('LOLLIPOP ( 4 PCS )', 140, 'img/Brost.png'), ('WINGS ( 5 PCS )', 150, 'img/Brost.png'), ('TIKKA ( 8 PCS )', 160, 'img/Brost.png')],
+            'COMBOS': [('MEDIUM COMBO', 399, 'img/Mediumcombo.png'), ('LARGE COMBO', 599, 'img/Largecombo.png')]
         }
         
         for cat_name, items in specials_data.items():
             cat = get_safe_category(cat_name)
-            for name, price in items:
+            for name, price, img_path in items:
                 MenuItem.objects.get_or_create(
                     category=cat, 
                     name=name, 
-                    defaults={'price': price}
+                    defaults={'price': price, 'image': img_path}
                 )
 
     # Fetch all active categories with their items - Optmized with prefetch_related

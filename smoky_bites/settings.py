@@ -87,8 +87,9 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 WHITENOISE_MANIFEST_STRICT = False
 
 # MEDIA (optional – Railway free is not persistent)
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+# MEDIA (Removed for Railway persistence - using STATIC)
+# MEDIA_URL = "/media/"
+# MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

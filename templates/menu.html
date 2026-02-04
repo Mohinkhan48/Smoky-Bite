@@ -218,62 +218,16 @@
             <div class="grid grid-cols-1 gap-y-0 relative z-20 px-4">
                 {% for category in standard_categories %}
                 <div class="mb-0">
-                    {% if 'BURGER' in category.name|upper %}
                     <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
                         <div class="relative inline-block">
                             <div
                                 class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
                             </div>
-                            <img src="{% static 'img/Burgerimage.png' %}" class="relative w-24 h-auto" alt="Burgers"
+                            <img src="{% static item.image %}" class="relative w-24 h-auto" alt="{{ item.name }}"
                                 loading="eager" fetchpriority="high"
                                 style="opacity: 1 !important; visibility: visible !important;">
                         </div>
                     </div>
-                    {% elif 'MOMO' in category.name|upper %}
-                    <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
-                        <div class="relative inline-block">
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                            </div>
-                            <img src="{% static 'img/Momos.png' %}" class="relative w-28 h-auto" alt="Momos"
-                                loading="eager" fetchpriority="high"
-                                style="opacity: 1 !important; visibility: visible !important;">
-                        </div>
-                    </div>
-                    {% elif 'BROASTED' in category.name|upper %}
-                    <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
-                        <div class="relative inline-block">
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                            </div>
-                            <img src="{% static 'img/Brost.png' %}" class="relative w-28 h-auto" alt="Broast"
-                                loading="eager" fetchpriority="high"
-                                style="opacity: 1 !important; visibility: visible !important;">
-                        </div>
-                    </div>
-                    {% elif 'MOCKTAIL' in category.name|upper %}
-                    <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
-                        <div class="relative inline-block">
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                            </div>
-                            <img src="{% static 'img/Mocktails.png' %}" class="relative w-28 h-auto" alt="Mocktails"
-                                loading="eager" fetchpriority="high"
-                                style="opacity: 1 !important; visibility: visible !important;">
-                        </div>
-                    </div>
-                    {% elif 'HOT' in category.name|upper and 'CRISPY' in category.name|upper %}
-                    <div class="mb-[-21px] mt-0 relative z-20 flex justify-center">
-                        <div class="relative inline-block">
-                            <div
-                                class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                            </div>
-                            <img src="{% static 'img/Hotcrispy.png' %}" class="relative w-28 h-auto" alt="Hotcrispy"
-                                loading="eager" fetchpriority="high"
-                                style="opacity: 1 !important; visibility: visible !important;">
-                        </div>
-                    </div>
-                    {% endif %}
 
                     <div class="mb-0 text-center">
                         <h2
@@ -290,8 +244,7 @@
                                 <div class="item-price font-bold text-lg text-white">₹{{ item.price }}</div>
                             </div>
                             <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
-                                data-price="{{ item.price }}"
-                                data-image="{% if 'BURGER' in category.name|upper %}{% static 'img/Burgerimage.png' %}{% elif 'MOMO' in category.name|upper %}{% static 'img/Momos.png' %}{% elif 'BROASTED' in category.name|upper %}{% static 'img/Brost.png' %}{% elif 'MOCKTAIL' in category.name|upper %}{% static 'img/Mocktails.png' %}{% elif 'HOT' in category.name|upper and 'CRISPY' in category.name|upper %}{% static 'img/Hotcrispy.png' %}{% else %}{% static 'img/placeholder.png' %}{% endif %}"
+                                data-price="{{ item.price }}" data-image="{% static item.image %}"
                                 class="bg-yellow-500 text-black font-bold text-xs px-2 py-1 rounded hover:bg-white transition uppercase mb-1 btn-smooth">
                                 ADD
                             </button>
@@ -345,37 +298,23 @@
                                 <div class="item-price font-bold text-lg text-white">₹{{ item.price }}</div>
                             </div>
                             <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
-                                data-price="{{ item.price }}" data-image="{% static 'img/Brost.png' %}"
+                                data-price="{{ item.price }}" data-image="{% static item.image %}"
                                 class="bg-yellow-500 text-black font-bold text-xs px-2 py-1 rounded hover:bg-white transition uppercase mb-1 btn-smooth">
                                 ADD
                             </button>
                         </div>
                         {% else %}
                         <!-- Combo Item Styling -->
-                        {% if 'LARGE' in item.name %}
                         <div class="mb-[-16px] translate-y-5 relative z-20 flex justify-start ml-2">
                             <div class="relative inline-block">
                                 <div
                                     class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
                                 </div>
-                                <img src="{% static 'img/Largecombo.png' %}" class="relative w-32 h-auto"
-                                    alt="Large Combo" loading="eager" fetchpriority="high"
+                                <img src="{% static item.image %}" class="relative w-32 h-auto" alt="{{ item.name }}"
+                                    loading="eager" fetchpriority="high"
                                     style="opacity: 1 !important; visibility: visible !important;">
                             </div>
                         </div>
-                        {% endif %}
-                        {% if 'MEDIUM' in item.name %}
-                        <div class="mb-[-16px] translate-y-1 relative z-20 flex justify-start ml-2">
-                            <div class="relative inline-block">
-                                <div
-                                    class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
-                                </div>
-                                <img src="{% static 'img/Mediumcombo.png' %}" class="relative w-32 h-auto"
-                                    alt="Medium Combo" loading="eager" fetchpriority="high"
-                                    style="opacity: 1 !important; visibility: visible !important;">
-                            </div>
-                        </div>
-                        {% endif %}
                         <div class="mb-0 -mt-16 border border-gray-800 p-2 rounded relative bg-gray-900 group">
 
 
@@ -391,8 +330,7 @@
                                 {% endif %}
                             </div>
                             <button onclick="quickAdd(this)" data-id="{{ item.id }}" data-name="{{ item.name }}"
-                                data-price="{{ item.price }}"
-                                data-image="{% if 'MEDIUM' in item.name %}{% static 'img/Mediumcombo.png' %}{% else %}{% static 'img/Largecombo.png' %}{% endif %}"
+                                data-price="{{ item.price }}" data-image="{% static item.image %}"
                                 class="absolute -top-2 -right-2 bg-yellow-500 text-black font-bold h-6 w-6 rounded-full flex items-center justify-center hover:bg-white transition shadow-lg z-50 btn-smooth">
                                 +
                             </button>

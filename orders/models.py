@@ -18,7 +18,7 @@ class MenuItem(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     cost_price = models.DecimalField(max_digits=6, decimal_places=2, default=0.00) # Added for finance tracking
     # Using URL or placeholder for image simplicity in this prototype
-    image = models.ImageField(upload_to='menu_items/', blank=True, null=True)
+    image = models.CharField(max_length=200, default='img/placeholder.png')
     is_available = models.BooleanField(default=True)
 
     class Meta:
