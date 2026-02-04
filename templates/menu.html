@@ -332,7 +332,8 @@
                         </div>
                         {% else %}
                         <!-- Combo Item Styling -->
-                        <div class="mb-[-16px] translate-y-5 relative z-20 flex justify-start ml-2">
+                        <div
+                            class="mb-[-11px] {% if 'MEDIUM' in item.name|upper %}translate-y-2{% else %}translate-y-5{% endif %} relative z-20 flex justify-start ml-2">
                             <div class="relative inline-block">
                                 <div
                                     class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-20 transform scale-110">
